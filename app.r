@@ -21,6 +21,16 @@ taxi_info = ldply(files, read_csv)
 #print(head(taxi_info))
 #print(nrow(taxi_info))
 
+#fix dates using lubridate
+#taxi_info$TripDate = as_date(ymd(taxi_info$Trip_Date))
+
+#add day, month and year data to csv
+#taxi_info$year = year(taxi_info$TripDate)
+#taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
+#taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
+
+print(head(taxi_info))
+
 #create the ui
 ui <- dashboardPage(
   #change header color
