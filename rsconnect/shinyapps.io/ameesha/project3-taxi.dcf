@@ -1,0 +1,13 @@
+name: project3-taxi
+title: project3-taxi
+username:
+account: ameesha
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6084373
+bundleId: 5795479
+url: https://ameesha.shinyapps.io/project3-taxi/
+when: 1649872974.25277
+lastSyncTime: 1649872974.25285
+asMultiple: FALSE
+asStatic: FALSE

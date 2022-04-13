@@ -161,9 +161,12 @@ server <- function(input, output, session) {
   
   #bar chart generating functions 
   output$RidesByDate <- renderPlot({
-    m <- ggplot(taxi_info, aes(x=Trip_Date)) + 
+    col <- c("#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6")
+    
+    m <- ggplot(taxi_info, aes(x=Trip_Date, fill = month(Trip_Date, abbr = TRUE, label = TRUE))) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma)
+      scale_y_continuous(labels = scales::comma) +
+      theme_bw() 
     m
     m
   })
@@ -171,33 +174,38 @@ server <- function(input, output, session) {
   output$RidesByStart <- renderPlot({
     m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma)
+      scale_y_continuous(labels = scales::comma) +
+      theme_bw() 
     m
   })
   
   output$RidesByWeekday <- renderPlot({
     m <- ggplot(taxi_info, aes(x=wday)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma)
+      scale_y_continuous(labels = scales::comma) +
+      theme_bw() 
     m
   })
   
   output$RidesByMonth <- renderPlot({
     m <- ggplot(taxi_info, aes(x=month)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma)
+      scale_y_continuous(labels = scales::comma) +
+      theme_bw() 
     m
   })
   output$RidesByMileage <- renderPlot({
     m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma)
+      scale_y_continuous(labels = scales::comma) +
+      theme_bw() 
     m
   })
   output$RidesByTime <- renderPlot({
     m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma)
+      scale_y_continuous(labels = scales::comma) +
+      theme_bw() 
     m
   })
   
