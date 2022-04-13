@@ -31,16 +31,16 @@ taxi_info$year = year(taxi_info$TripDate)
 taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
 taxi_info$day = day(taxi_info$TripDate)
 taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
-taxi_info$md = paste(taxi_info$month, taxi_info$day, sep = "-")
-
+taxi_info$DayMonth <- format(as.Date(taxi_info$TripDate), "%d-%m")
 
 print(head(taxi_info))
-
+print(min(taxi_info$TripDate))
+print(max(taxi_info$TripDate))
 
 DateSub <- setNames(aggregate(taxi_info, by=list(taxi_info$Trip_Time), FUN=sum), c("date", "rides"))
 print(head(DateSub))
 
-m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
+m <- ggplot(taxi_info, aes(x=DayMonth)) + 
   geom_bar(stat="count", width=0.7, fill="#33647A") + 
   scale_y_continuous(labels = scales::comma)
 m

@@ -28,8 +28,6 @@ taxi_info$TripDate = as_date(taxi_info$Trip_Date)
 taxi_info$year = year(taxi_info$TripDate)
 taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
 taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
-taxi_info$day = day(taxi_info$TripDate)
-taxi_info$md = paste(taxi_info$month, taxi_info$day, sep = "-")
 
 print(head(taxi_info))
 
@@ -163,7 +161,7 @@ server <- function(input, output, session) {
   
   #bar chart generating functions 
   output$RidesByDate <- renderPlot({
-    m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
+    m <- ggplot(taxi_info, aes(x=Trip_Date)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma)
     m
