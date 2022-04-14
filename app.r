@@ -57,12 +57,10 @@ ui <- dashboardPage(
   dashboardBody(
     tabItems(
       tabItem(tabName = "About",
-              h1("CTA Ridership Map Project"),
-              h2("Ridership Data From: Chicago Data Portal at https://data.cityofchicago.org/Transportation/CTA-Ridership-L-Station-Entries-Daily-Totals/5neh-572f"),
-              h2("Stations Location Data From: Chicago Data Portal at https://data.cityofchicago.org/Transportation/CTA-System-Information-List-of-L-Stops/8pix-ypme"),
+              h1("Taxi Ridership Map Project"),
+              h2("2019 Taxi Data From: Chicago Data Portal at https://data.cityofchicago.org/Transportation/Taxi-Trips-2019/h4cq-z3dy"),
               h2("Application Written by Ameesha Saxena and Rafiya Awan for UIC CS 424 Spring 2022")
-              
-              ), # tabitem About close
+      ), # tabitem About close
       tabItem(tabName = "Datavisualizations",
               tags$style(HTML("
               .box.box-solid.box-primary>.box-header {
@@ -129,10 +127,10 @@ ui <- dashboardPage(
               )#end fluidrow
               
               
-              ) # tabitem Visualizations close
-      ) #tabitems close
-    ) #dashboardBodyClose
-  ) #dashboardPage
+      ) # tabitem Visualizations close
+    ) #tabitems close
+  ) #dashboardBodyClose
+) #dashboardPage
   
   
 #server functions
@@ -140,22 +138,22 @@ server <- function(input, output, session) {
   
   #text return functions for box headers
   output$RidesByDateText <- renderText({
-    return("Number of Rides on each day of the year")
+    return("Number of Rides By Each Day of the Year")
   })
   output$RidesByStartText <- renderText({
-    return(paste("Number of Rides based on start time"))
+    return(paste("Number of Rides By Hour of Day (Start Time)"))
   })
   output$RidesByWeekdayText <- renderText({
-    return(paste("Number of Rides on each day of the week"))
+    return(paste("Number of Rides By Each Day of the Week"))
   })
   output$RidesByMonthText <- renderText({
-    return(paste("Number of Rides in each month"))
+    return(paste("Number of Rides By month"))
   })
   output$RidesByMileageText <- renderText({
-    return(paste("Number of Rides based on mileage"))
+    return(paste("Number of Rides By Mileage"))
   })
   output$RidesByTimeText <- renderText({
-    return(paste("Number of Rides with trip time"))
+    return(paste("Number of Rides By Trip Time"))
   })
   
   
