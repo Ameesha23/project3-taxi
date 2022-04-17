@@ -57,6 +57,7 @@ ui <- dashboardPage(
   dashboardBody(
     tabItems(
       tabItem(tabName = "About",
+              #TODO change to project 3
               h1("Taxi Ridership Map Project"),
               h2("2019 Taxi Data From: Chicago Data Portal at https://data.cityofchicago.org/Transportation/Taxi-Trips-2019/h4cq-z3dy"),
               h2("Application Written by Ameesha Saxena and Rafiya Awan for UIC CS 424 Spring 2022")
@@ -80,6 +81,24 @@ ui <- dashboardPage(
                               ")
               ),
               fluidRow(
+                #TODO add conditional panels for displaying tables in place of charts
+                column(1,
+                       align = "center",
+                       fluidRow(
+                         style = "padding-left:20px",
+                         HTML("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>"),
+                         h3("Options"),
+                         radioButtons("viewTables", h4("View Data as:"),
+                                      choices = list("Charts" = 0, 
+                                                     "Tables" = 1),selected = 0),
+                         radioButtons("miles", h4("Change distance unit"),
+                                      choices = list("Miles" = 0, 
+                                                     "Kilometers" = 1),selected = 0),
+                         radioButtons("timeAs", h4("View Time as:"),
+                                      choices = list("12Hr" = 0, 
+                                                     "24Hr" = 1),selected = 0),
+                         )
+                       ),
                 column(2,
                        align = "center",
                        #bar chart showing the distribution of the number of rides by day of year (Jan 1 through Dec 31)
@@ -136,6 +155,21 @@ ui <- dashboardPage(
 #server functions
 server <- function(input, output, session) {
   
+  # inputs
+  
+  viewTables<- reactive({
+    input$viewTables
+  })
+  
+  miles<-reactive({
+    input$miles
+  })
+  
+  timeAs<-reactive({
+    input$timeAs
+  })
+  
+  
   #text return functions for box headers
   output$RidesByDateText <- renderText({
     return("Number of Rides By Each Day of the Year")
@@ -164,7 +198,10 @@ server <- function(input, output, session) {
     m <- ggplot(taxi_info, aes(x=Trip_Date, fill = month(Trip_Date, abbr = TRUE, label = TRUE))) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma) +
-      theme_bw() 
+      labs(x = "Trip Date", y ="Rides") + 
+      theme_bw() +
+      theme(text = element_text(family = "sans", face = "bold")) +
+      theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))  
     m
     m
   })
@@ -173,7 +210,10 @@ server <- function(input, output, session) {
     m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma) +
-      theme_bw() 
+      labs(x = "Trip Time", y ="Rides") + 
+      theme_bw() +
+      theme(text = element_text(family = "sans", face = "bold")) +
+      theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
     m
   })
   
@@ -181,7 +221,10 @@ server <- function(input, output, session) {
     m <- ggplot(taxi_info, aes(x=wday)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma) +
-      theme_bw() 
+      labs(x = "Weekday", y ="Rides") + 
+      theme_bw() +
+      theme(text = element_text(family = "sans", face = "bold")) +
+      theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
     m
   })
   
@@ -189,22 +232,36 @@ server <- function(input, output, session) {
     m <- ggplot(taxi_info, aes(x=month)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma) +
-      theme_bw() 
+      labs(x = "Month", y ="Rides") + 
+      theme_bw() +
+      theme(text = element_text(family = "sans", face = "bold")) +
+      theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
     m
   })
   output$RidesByMileage <- renderPlot({
-    m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
-      geom_bar(stat="count", width=0.7, fill="#33647A") + 
+    
+    #TODO: add space between bars
+    m <- ggplot(taxi_info, aes(x=Trip_Miles)) + 
+      geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma) +
-      theme_bw() 
+      labs(x = "Miles", y ="Rides") + 
+      theme_bw() +
+      theme(text = element_text(family = "sans", face = "bold")) +
+      theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
     m
   })
+  
   output$RidesByTime <- renderPlot({
+    # TODO: add space between bars + find better division of bins
     m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
-      geom_bar(stat="count", width=0.7, fill="#33647A") + 
+      geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma) +
-      theme_bw() 
+      labs(x = "Total trip time", y ="Rides") + 
+      theme_bw() +
+      theme(text = element_text(family = "sans", face = "bold")) +
+      theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
     m
+    
   })
   
 }
