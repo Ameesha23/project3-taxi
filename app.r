@@ -53,7 +53,7 @@ ui <- dashboardPage(
                      menuItem("", tabName = "cheapBlankSpace", icon = NULL),
                      menuItem("About", tabName = "About", icon = NULL),
                      menuItem("Data Visualizations", tabName = "Datavisualizations", icon = NULL, selected = TRUE))
-                   ),
+  ),
   dashboardBody(
     tabItems(
       tabItem(tabName = "About",
@@ -86,21 +86,21 @@ ui <- dashboardPage(
                        fluidRow(
                          box(title = textOutput("RidesByDateText"), solidHeader = TRUE, status = "primary", width = 12,
                              plotOutput("RidesByDate", height = 300)
-                             )
-                         ),
+                         )
+                       ),
                        #bar chart showing the distribution of the number of rides by hour of day based on start time (midnight through 11pm)
                        fluidRow(
                          box(title = textOutput("RidesByStartText"), solidHeader = TRUE, status = "primary", width = 12,
                              plotOutput("RidesByStart", height = 300)
-                             )
-                         ),
+                         )
+                       ),
                        #bar chart showing the distribution of the number of rides by day of week (Monday through Sunday)
                        fluidRow(
                          box(title = textOutput("RidesByWeekdayText"), solidHeader = TRUE, status = "primary", width = 12,
                              plotOutput("RidesByWeekday", height = 300)
-                             )
                          )
-                       ),
+                       )
+                ),
                 column(2,
                        align = "center",
                        #bar chart showing the distribution of the number of rides by month of year (Jan through Dec)
@@ -122,7 +122,7 @@ ui <- dashboardPage(
                          )
                        )
                 ),
-              
+                
                 
               )#end fluidrow
               
@@ -131,8 +131,8 @@ ui <- dashboardPage(
     ) #tabitems close
   ) #dashboardBodyClose
 ) #dashboardPage
-  
-  
+
+
 #server functions
 server <- function(input, output, session) {
   
@@ -210,5 +210,4 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui = ui, server = server)
-
 
