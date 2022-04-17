@@ -253,7 +253,7 @@ server <- function(input, output, session) {
   
   output$RidesByTime <- renderPlot({
     # TODO: add space between bars + find better division of bins
-    m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
+    m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
       geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma) +
       labs(x = "Total trip time", y ="Rides") + 
@@ -263,6 +263,66 @@ server <- function(input, output, session) {
     m
     
   })
+  
+  output$TableByDate <- DT::renderDataTable(
+    DT::datatable({ 
+      df_new<- setNames(count(taxi_info$TripDate), c("Date", "Rides"))
+      df_new
+    }, 
+    options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
+    ), rownames = FALSE 
+    )
+  )
+  
+  output$TableByStart <- DT::renderDataTable(
+    DT::datatable({ 
+      df_new<- setNames(count(taxi_info$Trip_Time), c("Start_Time", "Rides"))
+      df_new
+    }, 
+    options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
+    ), rownames = FALSE 
+    )
+  )
+  
+  output$TableByWeekday <- DT::renderDataTable(
+    DT::datatable({ 
+      df_new<- setNames(count(taxi_info$wday), c("Day", "Rides"))
+      df_new
+    }, 
+    options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
+    ), rownames = FALSE 
+    )
+  )
+  
+  output$TableByMonth <- DT::renderDataTable(
+    DT::datatable({ 
+      df_new<- setNames(count(taxi_info$month), c("Month", "Rides"))
+      df_new
+    }, 
+    options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
+    ), rownames = FALSE 
+    )
+  )
+  
+  output$TableByMileage <- DT::renderDataTable(
+    DT::datatable({ 
+      df_new<- setNames(count(taxi_info$Trip_Miles), c("Trip_miles", "Rides"))
+      df_new
+    }, 
+    options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
+    ), rownames = FALSE 
+    )
+  )
+  
+  output$TableByTime <- DT::renderDataTable(
+    DT::datatable({ 
+      df_new<- setNames(count(taxi_info$Trip_Seconds), c("Start_Time", "Rides"))
+      df_new
+    }, 
+    options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
+    ), rownames = FALSE 
+    )
+  )
   
 }
 

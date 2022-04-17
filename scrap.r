@@ -38,9 +38,18 @@ print(max(taxi_info$TripDate))
 print(min(taxi_info$Trip_Miles))
 print(max(taxi_info$Trip_Miles))
 
+m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
+  geom_bar(stat="bin", binwidth = 500, fill="#33647A") + 
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = "Total trip time", y ="Rides") + 
+  theme_bw() +
+  theme(text = element_text(family = "sans", face = "bold")) +
+  theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
+m
 
-DateSub <- setNames(aggregate(taxi_info, by=list(taxi_info$Trip_Time), FUN=sum), c("date", "rides"))
-print(head(DateSub))
+
+df_new<- setNames(count(taxi_info$TripDate), c("Date", "Rides"))
+head(df_new)
 
 m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
   geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
