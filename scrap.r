@@ -35,8 +35,33 @@ print(head(taxi_info))
 print(str(taxi_info))
 print(min(taxi_info$TripDate))
 print(max(taxi_info$TripDate))
-print(min(taxi_info$Trip_Miles))
-print(max(taxi_info$Trip_Miles))
+print(min(taxi_info$Trip_Seconds))
+print(max(taxi_info$Trip_Seconds))
+
+#https://thisisdaryn.netlify.app/post/intro-to-making-maps-with-ggplot2/
+library(sf)
+
+pickups_comm <- setNames(count(taxi_info$Pickup_Community_Area), c("area_num_1", "Rides"))
+print(min(pickups_comm$area_num_1))
+print(max(pickups_comm$area_num_1))
+pickups_comm
+
+
+chi_map <- read_sf("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson") 
+chi_map
+chi_map$area_num_1 = as.numeric(chi_map$area_num_1)
+str(chi_map)
+chi_taxi_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
+chi_taxi_map
+                          
+
+
+m <- ggplot(data = chi_taxi_map, aes(fill = log(Rides))) + 
+  geom_sf() +
+  geom_sf_text(aes(label = area_num_1))+
+  theme_bw()+
+  ggtitle("Number of rides in areas")
+m
 
 m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
   geom_bar(stat="bin", binwidth = 500, fill="#33647A") + 

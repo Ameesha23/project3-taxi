@@ -12,6 +12,7 @@ library(readr)
 library(leaflet)
 library(leaflet.providers)
 library(viridis)
+library(sf)
 
 #get the file names with data
 files = list.files(pattern="*.csv", full.name = T)
@@ -29,7 +30,18 @@ taxi_info$year = year(taxi_info$TripDate)
 taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
 taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
 
-print(head(taxi_info))
+areas <- c(1:77)
+#separate a df with pickup areas and their corresponding rides
+pickups_comm <- setNames(count(taxi_info$Pickup_Community_Area), c("area_num_1", "Rides"))
+drop_comm <- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))
+#information about the community areas
+chi_map <- read_sf("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson") 
+pickup_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
+dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
+
+
+
+#print(head(taxi_info))
 
 #create the ui
 ui <- dashboardPage(
@@ -95,7 +107,11 @@ ui <- dashboardPage(
                          radioButtons("timeAs", h4("View Time As:"),
                                       choices = list("12Hr" = 0, 
                                                      "24Hr" = 1),selected = 0),
-                         )
+                         ),
+                         selectInput("comm_area", h4("Select community area"), 
+                                     areas)
+                       
+                       
                        ),
                 column(4,
                        fluidRow(
