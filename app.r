@@ -30,16 +30,16 @@ taxi_info$year = year(taxi_info$TripDate)
 taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
 taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
 
-areas <- c(1:77)
 #separate a df with pickup areas and their corresponding rides
 pickups_comm <- setNames(count(taxi_info$Pickup_Community_Area), c("area_num_1", "Rides"))
 drop_comm <- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))
 #information about the community areas
 chi_map <- read_sf("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson") 
+chi_map$area_num_1 = as.numeric(chi_map$area_num_1)
 pickup_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
 dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
-
-
+sub <- c("community", "area_num_1")
+community_menu <- chi_map[sub]
 
 #print(head(taxi_info))
 
@@ -109,7 +109,7 @@ ui <- dashboardPage(
                                                      "24Hr" = 1),selected = 0),
                          ),
                          selectInput("comm_area", h4("Select community area"), 
-                                     areas)
+                                     community_menu$community)
                        
                        
                        ),
@@ -348,6 +348,15 @@ server <- function(input, output, session) {
       theme(text = element_text(family = "sans", face = "bold")) +
       theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
     m
+    
+  })
+  
+  
+  output$commMap <- renderLeaflet({
+    marker_color = "#33647A"
+    m <- leaflet()
+    m <- addTiles(m)
+    m <- addProviderTiles(m, provider = "CartoDB.Positron")
     
   })
   

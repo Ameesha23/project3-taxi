@@ -46,6 +46,10 @@ print(min(pickups_comm$area_num_1))
 print(max(pickups_comm$area_num_1))
 pickups_comm
 
+areas <- c(1:77)
+sub <- c("community", "area_num_1")
+community_menu <- chi_map[sub]
+str(community_menu)
 
 chi_map <- read_sf("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson") 
 chi_map
