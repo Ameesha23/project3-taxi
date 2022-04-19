@@ -161,3 +161,4 @@ company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.',
                               '33RCAC'))
 names(company_names) <- c("company", "CompanyNew")
 head(company_names)
+

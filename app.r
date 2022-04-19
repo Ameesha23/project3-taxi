@@ -230,6 +230,9 @@ ui <- dashboardPage(
                          
                          selectInput("comm_area", h4("Select community area"), 
                                      community_menu$community),
+                         radioButtons("direction", "Rides starting or ending in community area",
+                                      choices = list("From" = 0, 
+                                                     "To" = 1),selected = 0),
                          
                          selectInput("company", h4("Select taxicab company"), 
                                      company_names$company),
