@@ -12,7 +12,7 @@ library(readr)
 library(leaflet)
 library(leaflet.providers)
 library(viridis)
-library(measurements)
+#library(measurements)
 library(sf)
 remotes::install_github("willdebras/shinykeyboard")
 
