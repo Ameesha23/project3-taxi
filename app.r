@@ -33,15 +33,17 @@ taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
 #separate a df with pickup areas and their corresponding rides
 pickups_comm <- setNames(count(taxi_info$Pickup_Community_Area), c("area_num_1", "Rides"))
 drop_comm <- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))
+
 #information about the community areas
 chi_map <- read_sf("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson") 
 chi_map$area_num_1 = as.numeric(chi_map$area_num_1)
 pickup_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
 dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
-sub <- c("community", "area_num_1")
-community_menu <- chi_map[sub]
 
-#print(head(taxi_info))
+#make a menu for displaying the menu for selecting community areas
+community_menu <- data.frame(chi_map$community, chi_map$area_num_1)
+names(community_menu) <- c("community", "area_num_1")
+community_menu <- community_menu[order(community_menu$community),]
 
 #create the ui
 ui <- dashboardPage(
