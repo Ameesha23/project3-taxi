@@ -14,7 +14,7 @@ library(leaflet.providers)
 library(viridis)
 #library(measurements)
 library(sf)
-remotes::install_github("willdebras/shinykeyboard")
+#remotes::install_github("willdebras/shinykeyboard")
 
 #get the file names with data
 files = list.files(pattern="*.csv", full.name = T)
@@ -33,7 +33,7 @@ taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
 taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
 
 #add column with distance in km - convert trip miles to km
-taxi_info$Trip_km = conv_unit(taxi_info$Trip_Miles, from = "mi", to = "km")
+taxi_info$Trip_km = taxi_info$Trip_Miles * 1.60934
 
 #add column with start time as 12hr am/pm
 taxi_info$Time_Twelve <- format(strptime(taxi_info$Trip_Time, '%H'), '%I %p')
@@ -235,9 +235,9 @@ ui <- dashboardPage(
                                       choices = list("12Hr" = 0, 
                                                      "24Hr" = 1),selected = 0),
                          
-                         selectInput("comm_area", h4("Select community area"), 
+                         selectInput("comm_area", h5("Select community area"), 
                                      community_menu$community),
-                         radioButtons("direction", "Rides starting or ending in community area",
+                         radioButtons("direction", "Rides FROM or TO the community area",
                                       choices = list("From" = 0, 
                                                      "To" = 1),selected = 0),
                          
