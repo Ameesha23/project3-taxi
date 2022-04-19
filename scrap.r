@@ -162,3 +162,11 @@ company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.',
 names(company_names) <- c("company", "CompanyNew")
 head(company_names)
 
+
+#convert from 24hr to 12hr am/pm
+taxi_info$TimeNew <- format(strptime(taxi_info$Trip_Time, '%H'), '%I %p')
+head(taxi_info, 100)
+tail(taxi_info)
+taxi_info[2000:2025,]
+
+

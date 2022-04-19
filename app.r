@@ -35,6 +35,9 @@ taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
 #add column with distance in km - convert trip miles to km
 taxi_info$Trip_km = conv_unit(taxi_info$Trip_Miles, from = "mi", to = "km")
 
+#add column with start time as 12hr am/pm
+taxi_info$Time_Twelve <- format(strptime(taxi_info$Trip_Time, '%H'), '%I %p')
+
 #separate a df with pickup areas and their corresponding rides
 pickups_comm <- setNames(count(taxi_info$Pickup_Community_Area), c("area_num_1", "Rides"))
 drop_comm <- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))
@@ -424,13 +427,26 @@ server <- function(input, output, session) {
   })
   
   output$RidesByStart <- renderPlot({
-    m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
-      geom_bar(stat="count", width=0.7, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma) +
-      labs(x = "Trip Start Time", y ="Rides") + 
-      theme_bw() +
+    
+    #check if user wants time in 12 hour or 24 hour format
+    if(timeAs() == 0) {
+      m <- ggplot(taxi_info, aes(x=Time_Twelve)) + 
+        geom_bar(stat="count", width=0.7, fill="#33647A") + 
+        scale_y_continuous(labels = scales::comma) +
+        labs(x = "Trip Start Time", y ="Rides")
+    }
+    else {
+      m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
+        geom_bar(stat="count", width=0.7, fill="#33647A") + 
+        scale_y_continuous(labels = scales::comma) +
+        labs(x = "Trip Start Time", y ="Rides")
+    }
+    
+    m <- m + theme_bw() +
       theme(text = element_text(family = "sans", face = "bold")) +
       theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
+    
+    
     m
   })
   
@@ -486,7 +502,7 @@ server <- function(input, output, session) {
     m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
       geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma) +
-      labs(x = "Total Trip Time", y ="Rides") + 
+      labs(x = "Total Trip Time (Seconds)", y ="Rides") + 
       theme_bw() +
       theme(text = element_text(family = "sans", face = "bold")) +
       theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
@@ -514,8 +530,15 @@ server <- function(input, output, session) {
   )
   
   output$TableByStart <- DT::renderDataTable(
-    DT::datatable({ 
-      df_new<- setNames(count(taxi_info$Trip_Time), c("Start Time", "Rides"))
+    DT::datatable({
+      #check if user wants time in 12 hour or 24 hour format
+      if(timeAs() == 0) {
+        df_new <- setNames(count(taxi_info$Time_Twelve), c("Start Time", "Rides"))
+      }
+      else {
+        df_new <- setNames(count(taxi_info$Trip_Time), c("Start Time", "Rides"))
+      }
+      
       df_new
     }, 
     options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
@@ -561,7 +584,7 @@ server <- function(input, output, session) {
   
   output$TableByTime <- DT::renderDataTable(
     DT::datatable({ 
-      df_new<- setNames(count(taxi_info$Trip_Seconds), c("Trip Time", "Rides"))
+      df_new<- setNames(count(taxi_info$Trip_Seconds), c("Trip Time (Seconds)", "Rides"))
       df_new
     }, 
     options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
