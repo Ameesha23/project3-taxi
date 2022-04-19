@@ -33,6 +33,10 @@ taxi_info$year = year(taxi_info$TripDate)
 taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
 taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
 
+taxi_info$Trip_km = conv_unit(taxi_info$Trip_Miles, from = "mi", to = "km")
+taxi_info$km2 = taxi_info$Trip_Miles * 1.60934
+head(taxi_info)
+
 #separate a df with pickup areas and their corresponding rides
 pickups_comm <- setNames(count(taxi_info$Pickup_Community_Area), c("area_num_1", "Rides"))
 drop_comm <- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))

@@ -12,9 +12,9 @@ library(readr)
 library(leaflet)
 library(leaflet.providers)
 library(viridis)
-library(measurements)
-library(sf)
-remotes::install_github("willdebras/shinykeyboard")
+#library(measurements)
+#library(sf)
+#remotes::install_github("willdebras/shinykeyboard")
 
 #get the file names with data
 files = list.files(pattern="*.csv", full.name = T)
@@ -33,7 +33,7 @@ taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
 taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
 
 #add column with distance in km - convert trip miles to km
-taxi_info$Trip_km = conv_unit(taxi_info$Trip_Miles, from = "mi", to = "km")
+taxi_info$Trip_km = taxi_info$Trip_Miles * 1.60934
 
 #add column with start time as 12hr am/pm
 taxi_info$Time_Twelve <- format(strptime(taxi_info$Trip_Time, '%H'), '%I %p')
