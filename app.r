@@ -13,6 +13,7 @@ library(leaflet)
 library(leaflet.providers)
 library(viridis)
 library(sf)
+remotes::install_github("willdebras/shinykeyboard")
 
 #get the file names with data
 files = list.files(pattern="*.csv", full.name = T)
@@ -232,11 +233,12 @@ ui <- dashboardPage(
                          
                          selectInput("company", h4("Select taxicab company"), 
                                      company_names$company),
+                         #TODO add virtual keyboard
+                         #https://github.com/Emelieh21/shinykeyboard
                          ),
                        ),
                 column(4,
                        fluidRow(
-                         
                          conditionalPanel(
                            condition = "input.viewTables == 0",
                            column(6,
