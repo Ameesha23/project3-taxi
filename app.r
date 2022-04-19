@@ -12,7 +12,8 @@ library(readr)
 library(leaflet)
 library(leaflet.providers)
 library(viridis)
-library(sf)
+#library(sf)
+library(measurements)
 
 #get the file names with data
 files = list.files(pattern="*.csv", full.name = T)
@@ -30,14 +31,17 @@ taxi_info$year = year(taxi_info$TripDate)
 taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
 taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
 
+#convert trip miles to km
+taxi_info$Trip_km = conv_unit(taxi_info$Trip_Miles, from = "mi", to = "km")
+
 areas <- c(1:77)
 #separate a df with pickup areas and their corresponding rides
-pickups_comm <- setNames(count(taxi_info$Pickup_Community_Area), c("area_num_1", "Rides"))
-drop_comm <- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))
+#pickups_comm <- setNames(count(taxi_info$Pickup_Community_Area), c("area_num_1", "Rides"))
+#drop_comm <- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))
 #information about the community areas
-chi_map <- read_sf("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson") 
-pickup_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
-dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
+#chi_map <- read_sf("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson") 
+# pickup_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
+# dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
 
 
 
@@ -252,7 +256,7 @@ server <- function(input, output, session) {
     return(paste("Number of Rides By Month"))
   })
   output$RidesByMileageText <- renderText({
-    return(paste("Number of Rides By Mileage"))
+    return(paste("Number of Rides By Distance Traveled"))
   })
   output$RidesByTimeText <- renderText({
     return(paste("Number of Rides By Trip Time"))
@@ -272,7 +276,7 @@ server <- function(input, output, session) {
     return(paste("Number of Rides By Month"))
   })
   output$RidesByMileageText2 <- renderText({
-    return(paste("Number of Rides By Mileage"))
+    return(paste("Number of Rides By Distance Traveled"))
   })
   output$RidesByTimeText2 <- renderText({
     return(paste("Number of Rides By Trip Time"))
@@ -328,13 +332,26 @@ server <- function(input, output, session) {
   output$RidesByMileage <- renderPlot({
     
     #TODO: add space between bars
-    m <- ggplot(taxi_info, aes(x=Trip_Miles)) + 
-      geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma) +
-      labs(x = "Trip Miles", y ="Rides") + 
-      theme_bw() +
+    
+    #check if user wants distance in mi or km
+    if(miles() == 0) {
+      m <- ggplot(taxi_info, aes(x=Trip_Miles)) + 
+        geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
+        scale_y_continuous(labels = scales::comma) +
+        labs(x = "Trip Distance (Miles)", y ="Rides")
+    }
+    else {
+      m <- ggplot(taxi_info, aes(x=Trip_km)) + 
+        geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
+        scale_y_continuous(labels = scales::comma) +
+        labs(x = "Trip Distance (Kilometers)", y ="Rides")
+    }
+    
+    m <- m + theme_bw() +
       theme(text = element_text(family = "sans", face = "bold")) +
       theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
+    
+    
     m
   })
   
@@ -392,8 +409,14 @@ server <- function(input, output, session) {
   )
   
   output$TableByMileage <- DT::renderDataTable(
-    DT::datatable({ 
-      df_new<- setNames(count(taxi_info$Trip_Miles), c("Trip Miles", "Rides"))
+    DT::datatable({
+      #check if user wants distance in mi or km
+      if(miles() == 0) {
+        df_new<- setNames(count(taxi_info$Trip_Miles), c("Trip Miles", "Rides"))
+      }
+      else {
+        df_new<- setNames(count(taxi_info$Trip_km), c("Trip Kilometers", "Rides"))
+      }
       df_new
     }, 
     options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
