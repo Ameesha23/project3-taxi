@@ -14,6 +14,7 @@ library(readr)
 library(leaflet)
 library(leaflet.providers)
 library(viridis)
+library(sf)
 
 #get the file names with data
 files = list.files(pattern="*.csv", full.name = T)
@@ -31,72 +32,133 @@ taxi_info$year = year(taxi_info$TripDate)
 taxi_info$month = month(taxi_info$TripDate, abbr = TRUE, label = TRUE)
 taxi_info$wday = wday(taxi_info$TripDate, label=TRUE)
 
-print(head(taxi_info))
-print(str(taxi_info))
-print(min(taxi_info$TripDate))
-print(max(taxi_info$TripDate))
-print(min(taxi_info$Trip_Seconds))
-print(max(taxi_info$Trip_Seconds))
-
-#https://thisisdaryn.netlify.app/post/intro-to-making-maps-with-ggplot2/
-library(sf)
-
+#separate a df with pickup areas and their corresponding rides
 pickups_comm <- setNames(count(taxi_info$Pickup_Community_Area), c("area_num_1", "Rides"))
-print(min(pickups_comm$area_num_1))
-print(max(pickups_comm$area_num_1))
-pickups_comm
+drop_comm <- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))
 
-
+#information about the community areas
 chi_map <- read_sf("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson") 
-chi_map
 chi_map$area_num_1 = as.numeric(chi_map$area_num_1)
-str(chi_map)
-chi_taxi_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
-chi_taxi_map
-                          
+pickup_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
+dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
 
+#make a menu for displaying the menu for selecting community areas
+community_menu <- data.frame(chi_map$community, chi_map$area_num_1)
+names(community_menu) <- c("community", "area_num_1")
+head(community_menu)
 
-m <- ggplot(data = chi_taxi_map, aes(fill = log(Rides))) + 
-  geom_sf() +
-  geom_sf_text(aes(label = area_num_1))+
-  theme_bw()+
-  ggtitle("Number of rides in areas")
-m
-
-m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
-  geom_bar(stat="bin", binwidth = 500, fill="#33647A") + 
-  scale_y_continuous(labels = scales::comma) +
-  labs(x = "Total trip time", y ="Rides") + 
-  theme_bw() +
-  theme(text = element_text(family = "sans", face = "bold")) +
-  theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
-m
-
-
-df_new<- setNames(count(taxi_info$TripDate), c("Date", "Rides"))
-head(df_new)
-
-m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
-  geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
-  scale_y_continuous(labels = scales::comma) +
-  labs(x = "Trip Time", y ="Number of Rides") + 
-  theme_bw() 
-m
-
-
-g <- ggplot(taxi_info, aes(x = Trip_Miles)) + 
-  geom_histogram(colour = 4, fill = "white", 
-                 bins = 15)
-g
-
-
-
-#m <- m + geom_bar(stat="identity", width=0.7, fill="#33647A") +
-#scale_fill_manual(values = c("(-Inf, 0]" = "#601e1e", "[1, Inf)" = "#153e51")) +
-#scale_fill_gradient2(midpoint = 0, low = '#082b3a', high = '#490f0f') +
-#m <- m + theme_bw() +
-#  labs(x=paste("Station Name"), y="Total Entries") +
-#  theme(text = element_text(family = "sans", face = "bold")) +
-#  theme(axis.text.x = element_text(angle = 70, hjust=1))
-
+#make a dataframe for taxicab companies and their abbreviations
+company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.', 
+                              'Taxi Affiliation Services',
+                              'Taxicab Insurance Agency, LLC', 
+                              'Choice Taxi Association',
+                              'Star North Management LLC', 
+                              'Top Cab Affiliation',
+                              'Chicago Independents', 
+                              'KOAM Taxi Association',
+                              '1085 - 72312 N and W Cab Co', 
+                              'Chicago Medallion Management',
+                              'Chicago Carriage Cab Corp', 
+                              'Flash Cab', 'Globe Taxi',
+                              'Patriot Taxi Dba Peace Taxi Associat', 
+                              'City Service',
+                              '24 Seven Taxi', 
+                              'Sun Taxi', 
+                              'Medallion Leasin',
+                              'Taxi Affiliation Service Yellow', 
+                              'Nova Taxi Affiliation Llc',
+                              'Gold Coast Taxi', 
+                              'Chicago Taxicab', 
+                              'Blue Diamond', 
+                              'Yellow Cab',
+                              '312 Medallion Management Corp', 
+                              'Checker Taxi Affiliation',
+                              '5 Star Taxi', 
+                              'Metro Jet Taxi A', 
+                              'Checker Taxi',
+                              '6742 - 83735 Tasha ride inc', 
+                              'Setare Inc',
+                              'American United Taxi Affiliation', 
+                              '1469 - 64126 Omar Jada',
+                              'American United',
+                              '6743 - 78771 Luhak Corp', 
+                              'Leonard Cab Co',
+                              '4053 - 40193 Adwar H. Nikola',
+                              '3011 - 66308 JBL Cab Inc.',
+                              '4623 - 27290 Jay Kim', 
+                              '3094 - 24059 G.L.B. Cab Co',
+                              '2092 - 61288 Sbeih company', 
+                              '2733 - 74600 Benny Jona',
+                              '6574 - Babylon Express Inc.',
+                              '3623 - 72222 Arrington Enterprises', 
+                              'Chicago Star Taxicab',
+                              '3721 - Santamaria Express', 
+                              'Alvaro Santamaria',
+                              '5006 - 39261 Salifu Bawa', 
+                              '5062 - 34841 Sam Mestas',
+                              '5074 - 54002 Ahzmi Inc', 
+                              '3620 - 52292 David K. Cab Corp.',
+                              '5874 - 73628 Sergey Cab Corp.',
+                              '3591 - 63480 Chuks Cab',
+                              'Petani Cab Corp',
+                              'U Taxicab', 
+                              '3556 - 36214 RC Andrews Cab'),
+                            c('BRTAI', 
+                              'TAS',
+                              'TIAL', 
+                              'CTA',
+                              'SNML', 
+                              'TCA',
+                              'CI', 
+                              'KTA',
+                              'NWCC', 
+                              'CMM',
+                              'CCCC', 
+                              'FC', 
+                              'GT',
+                              'PTDPTA', 
+                              'CS',
+                              '24ST', 
+                              'ST', 
+                              'ML',
+                              'TASY', 
+                              'NTAL',
+                              'GCT', 
+                              'CT', 
+                              'BD', 
+                              'YC',
+                              '312MMC', 
+                              'ChTA',
+                              '5ST', 
+                              'MJTA', 
+                              'ChT',
+                              '68TRI', 
+                              'SI',
+                              'AUTA', 
+                              '16OJ',
+                              'AU',
+                              '67LC', 
+                              'LCC',
+                              '44AHN',
+                              '36JCI',
+                              '42JK', 
+                              '32GCC',
+                              '26SC', 
+                              '27BJ',
+                              '6BEI',
+                              '37AE', 
+                              'CST',
+                              '3SE', 
+                              'AS',
+                              '53SB', 
+                              '53SM',
+                              '55AI', 
+                              '35DKCC',
+                              '57SCC',
+                              '36CC',
+                              'PCC',
+                              'UT', 
+                              '33RCAC'))
+names(company_names) <- c("company", "CompanyNew")
+head(company_names)
 
