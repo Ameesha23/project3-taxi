@@ -52,9 +52,12 @@ dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
 community_menu <- data.frame(chi_map$community, chi_map$area_num_1)
 names(community_menu) <- c("community", "area_num_1")
 community_menu <- community_menu[order(community_menu$community),]
+new_row <- c(' ',' ')
+community_menu <- rbind(new_row, community_menu)    
 
 #make a dataframe for taxicab companies and their abbreviations
-company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.', 
+company_names <- data.frame(c(' ',
+                              'Blue Ribbon Taxi Association Inc.', 
                               'Taxi Affiliation Services',
                               'Taxicab Insurance Agency, LLC', 
                               'Choice Taxi Association',
@@ -109,7 +112,8 @@ company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.',
                               'Petani Cab Corp',
                               'U Taxicab', 
                               '3556 - 36214 RC Andrews Cab'),
-                            c('BRTAI', 
+                            c(' ',
+                              'BRTAI', 
                               'TAS',
                               'TIAL', 
                               'CTA',
@@ -167,6 +171,10 @@ company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.',
                               '33RCAC'))
 names(company_names) <- c("company", "CompanyNew")
 company_names <- company_names[order(company_names$company),]
+
+print(head(taxi_info))
+print(head(community_menu))
+print(head(company_names))
 
 #create the ui
 ui <- dashboardPage(
@@ -236,7 +244,8 @@ ui <- dashboardPage(
                                                      "24Hr" = 1),selected = 0),
                          
                          selectInput("comm_area", h5("Select community area"), 
-                                     community_menu$community),
+                                     community_menu$community, selected = NULL),
+                         
                          radioButtons("direction", "Rides FROM or TO the community area",
                                       choices = list("From" = 0, 
                                                      "To" = 1),selected = 0),
@@ -357,7 +366,6 @@ ui <- dashboardPage(
 server <- function(input, output, session) {
   
   # inputs
-  
   viewTables<- reactive({
     input$viewTables
   })
@@ -369,6 +377,40 @@ server <- function(input, output, session) {
   timeAs<-reactive({
     input$timeAs
   })
+  
+  comm_area<-reactive({
+    input$comm_area
+  })
+  
+  direction<-reactive({
+    input$direction
+  })
+  
+  company<-reactive({
+    input$company
+  })
+  
+  #TODO change to independant
+  data_new<-reactive({
+    if(comm_area() == ' '){
+      data_new <- taxi_info
+    }
+    if(comm_area() != ' ' && direction() == 0){
+      data_new <- subset(taxi_info,  Pickup_Community_Area == community_menu[which(community_menu$community == comm_area()), "area_num_1"])
+    }
+    if(comm_area() != ' ' && direction() == 1){
+      data_new <- subset(taxi_info,  Dropoff_Community_Area == community_menu[which(community_menu$community == comm_area()), "area_num_1"])
+    }
+    if(company() != ' ' && direction() == 0){
+      data_new <- subset(taxi_info,  Pickup_Community_Area == company_names[which(company_names$company == company()), "CompanyNew"])
+    }
+    if(company() != ' ' && direction() == 1){
+      data_new <- subset(taxi_info,  Dropoff_Community_Area == company_names[which(company_names$company == company()), "CompanyNew"])
+    }
+    
+    data_new
+  })
+  
   
   
   #text return functions for box plot headers
@@ -413,16 +455,20 @@ server <- function(input, output, session) {
   
   
   #bar chart generating functions 
+  #figure out how to add all communities
   output$RidesByDate <- renderPlot({
     col <- c("#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6")
     
-    m <- ggplot(taxi_info, aes(x=Trip_Date, fill = month(Trip_Date, abbr = TRUE, label = TRUE))) + 
-      geom_bar(stat="count", width=0.7, fill="#33647A") + 
+    
+    #change plot based on community area
+    m <- ggplot(data_new(), aes(x=Trip_Date, fill = month)) + 
+      geom_bar(stat="count", width=0.7, show.legend = FALSE) + 
       scale_y_continuous(labels = scales::comma) +
       labs(x = "Trip Date", y ="Rides") + 
       theme_bw() +
       theme(text = element_text(family = "sans", face = "bold")) +
-      theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))  
+      theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))+
+      scale_fill_manual(values = col)
     m
   })
   
@@ -471,9 +517,11 @@ server <- function(input, output, session) {
       theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
     m
   })
+  
   output$RidesByMileage <- renderPlot({
     
     #TODO: add space between bars
+    #TODO logarithmic binning
     
     #check if user wants distance in mi or km
     if(miles() == 0) {
@@ -497,10 +545,12 @@ server <- function(input, output, session) {
     m
   })
   
+  #can't figure out how to add space between bars TODO
+  #TODO logarithmic binning
   output$RidesByTime <- renderPlot({
     # TODO: add space between bars + find better division of bins
     m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
-      geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
+      geom_bar(stat="bin", binwidth = 300, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma) +
       labs(x = "Total Trip Time (Seconds)", y ="Rides") + 
       theme_bw() +

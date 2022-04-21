@@ -50,7 +50,8 @@ dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
 #make a menu for displaying the menu for selecting community areas
 community_menu <- data.frame(chi_map$community, chi_map$area_num_1)
 names(community_menu) <- c("community", "area_num_1")
-head(community_menu)
+community_menu <- community_menu[order(community_menu$community),]
+print(community_menu[which(community_menu$community == "ALBANY PARK"), "area_num_1"])
 
 #make a dataframe for taxicab companies and their abbreviations
 company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.', 
@@ -174,4 +175,16 @@ head(taxi_info, 100)
 tail(taxi_info)
 taxi_info[2000:2025,]
 
+
+m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
+  geom_bar(stat="bin", binwidth = 300, fill="#33647A", width = 0.98) + 
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = "Total Trip Time (Seconds)", y ="Rides") + 
+  theme_bw() +
+  theme(text = element_text(family = "sans", face = "bold")) +
+  theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
+m
+
+m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + geom_histogram(bins=15) + geom_bar(width = 0.9)
+m
 
