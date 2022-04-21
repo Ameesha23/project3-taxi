@@ -52,11 +52,11 @@ dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
 community_menu <- data.frame(chi_map$community, chi_map$area_num_1)
 names(community_menu) <- c("community", "area_num_1")
 community_menu <- community_menu[order(community_menu$community),]
-new_row <- c(' ',' ')
+new_row <- c('City of Chicago','0')
 community_menu <- rbind(new_row, community_menu)    
 
 #make a dataframe for taxicab companies and their abbreviations
-company_names <- data.frame(c(' ',
+company_names <- data.frame(c('All Taxi Companies',
                               'Blue Ribbon Taxi Association Inc.', 
                               'Taxi Affiliation Services',
                               'Taxicab Insurance Agency, LLC', 
@@ -112,7 +112,7 @@ company_names <- data.frame(c(' ',
                               'Petani Cab Corp',
                               'U Taxicab', 
                               '3556 - 36214 RC Andrews Cab'),
-                            c(' ',
+                            c('ALL',
                               'BRTAI', 
                               'TAS',
                               'TIAL', 
@@ -243,15 +243,15 @@ ui <- dashboardPage(
                                       choices = list("12Hr" = 0, 
                                                      "24Hr" = 1),selected = 0),
                          
-                         selectInput("comm_area", h5("Select community area"), 
-                                     community_menu$community, selected = NULL),
+                         selectInput("comm_area", h5("Select Community Area"), 
+                                     community_menu$community, selected = 'City of Chicago'),
                          
-                         radioButtons("direction", "Rides FROM or TO the community area",
+                         radioButtons("direction", "Rides FROM or TO the Community Area",
                                       choices = list("From" = 0, 
                                                      "To" = 1),selected = 0),
                          
-                         selectInput("company", h4("Select taxicab company"), 
-                                     company_names$company),
+                         selectInput("company", h4("Select Taxicab Company"), 
+                                     company_names$company, selected = 'All Taxi Companies'),
                          #TODO add virtual keyboard
                          #https://github.com/Emelieh21/shinykeyboard
                          ),
@@ -392,16 +392,16 @@ server <- function(input, output, session) {
   
   #TODO change to independant
   data_new<-reactive({
-    if(comm_area() == ' '){
+    if(comm_area() == 'City of Chicago'){
       data_new <- taxi_info
     }
-    if(comm_area() != ' ' && direction() == 0){
+    if(comm_area() != 'City of Chicago' && direction() == 0){
       data_new <- subset(taxi_info,  Pickup_Community_Area == community_menu[which(community_menu$community == comm_area()), "area_num_1"])
     }
-    if(comm_area() != ' ' && direction() == 1){
+    if(comm_area() != 'City of Chicago' && direction() == 1){
       data_new <- subset(taxi_info,  Dropoff_Community_Area == community_menu[which(community_menu$community == comm_area()), "area_num_1"])
     }
-    if(company() != ' '){
+    if(company() != 'All Taxi Companies'){
       data_new <- subset(taxi_info,  CompanyNew == company_names[which(company_names$company == company()), "CompanyNew"])
     }
     data_new
