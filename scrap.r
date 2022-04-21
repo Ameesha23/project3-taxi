@@ -16,6 +16,7 @@ library(leaflet.providers)
 library(viridis)
 library(measurements)
 library(sf)
+library(rgdal)
 
 #get the file names with data
 files = list.files(pattern="*.csv", full.name = T)
@@ -46,6 +47,12 @@ chi_map <- read_sf("https://raw.githubusercontent.com/thisisdaryn/data/master/ge
 chi_map$area_num_1 = as.numeric(chi_map$area_num_1)
 pickup_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
 dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
+
+print(typeof(chi_map))
+
+#read using rgdal
+chiMapSP <- rgdal::readOGR("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson")
+print(typeof(chiMapSP))
 
 #make a menu for displaying the menu for selecting community areas
 community_menu <- data.frame(chi_map$community, chi_map$area_num_1)
@@ -188,3 +195,24 @@ m
 m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + geom_histogram(bins=15) + geom_bar(width = 0.9)
 m
 
+#test map:
+nycounties <- rgdal::readOGR("https://rstudio.github.io/leaflet/json/nycounties.geojson")
+
+pal <- colorNumeric("viridis", NULL)
+
+leaflet(nycounties) %>%
+  addTiles() %>%
+  addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+              opacity = 1.0, fillOpacity = 0.5)
+  
+  # addPolygons(stroke = FALSE, smoothFactor = 0.3, fillOpacity = 1,
+  #             fillColor = ~pal(log10(pop)),
+  #             label = ~paste0(county, ": ", formatC(pop, big.mark = ","))) %>%
+  # addLegend(pal = pal, values = ~log10(pop), opacity = 1.0,
+  #           labFormat = labelFormat(transform = function(x) round(10^x)))
+
+leaflet(chi_map) %>%
+  addTiles() %>%
+  addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+              opacity = 1.0, fillOpacity = 0.5) %>%
+  addLegend(pal = pal, values = c(10,20,30), opacity = 1.0)

@@ -256,7 +256,7 @@ ui <- dashboardPage(
                          #https://github.com/Emelieh21/shinykeyboard
                          ),
                        ),
-                column(4,
+                column(6,
                        fluidRow(
                          conditionalPanel(
                            condition = "input.viewTables == 0",
@@ -350,6 +350,15 @@ ui <- dashboardPage(
                                   )
                            )
                          ) # end of second, tables, conditionalPanel
+                       )
+                ),
+                column(5,
+                       align="center",
+                       fluidRow(
+                         style = "padding-left:20px",
+                         box(title = "Map of Community Areas", solidHeader = TRUE, status = "primary", width = 12,
+                             leafletOutput("commMap", height = 1400)
+                         )
                        )
                 )
                 
@@ -559,9 +568,14 @@ server <- function(input, output, session) {
   
   output$commMap <- renderLeaflet({
     marker_color = "#33647A"
-    m <- leaflet()
+    m <- leaflet(chi_map)
     m <- addTiles(m)
     m <- addProviderTiles(m, provider = "CartoDB.Positron")
+    
+    m <- addPolygons(m, color = "#444444", weight = 1, smoothFactor = 0.5,
+                opacity = 1.0, fillOpacity = 0.5)
+    
+    m
     
   })
   
