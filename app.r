@@ -53,7 +53,9 @@ community_menu <- data.frame(chi_map$community, chi_map$area_num_1)
 names(community_menu) <- c("community", "area_num_1")
 community_menu <- community_menu[order(community_menu$community),]
 new_row <- c('City of Chicago','0')
-community_menu <- rbind(new_row, community_menu)    
+community_menu <- rbind(new_row, community_menu)   
+
+targetCol <- "Dropoff_Community_Area"
 
 #make a dataframe for taxicab companies and their abbreviations
 company_names <- data.frame(c('All Taxi Companies',
@@ -393,7 +395,7 @@ ui <- dashboardPage(
                        fluidRow(
                          style = "padding-left:20px",
                          box(title = "Map of Community Areas", solidHeader = TRUE, status = "primary", width = 12,
-                             leafletOutput("commMap", height = 1400)
+                             leafletOutput("commMap", height = 1200)
                          )
                        )
                 )
@@ -435,6 +437,25 @@ server <- function(input, output, session) {
     input$company
   })
   
+  
+  # change company input based on community area selection
+  observeEvent(input$comm_area, {
+    
+    if(comm_area() != 'City of Chicago') {
+        updateSelectInput(session, "company", "Select Taxicab Company", company_names$company, selected = 'All Taxi Companies')
+    }
+    
+  })
+  
+  # change community area input based on company selection
+  observeEvent(input$company, {
+    
+    if(company() != 'All Taxi Companies') {
+        updateSelectInput(session, "comm_area", "Select Community Area", community_menu$community, selected = 'City of Chicago')
+    }
+    
+  })
+  
   #TODO change to independant
   data_new<-reactive({
     if(comm_area() == 'City of Chicago'){
@@ -442,9 +463,11 @@ server <- function(input, output, session) {
     }
     if(comm_area() != 'City of Chicago' && direction() == 0){
       data_new <- subset(taxi_info,  Pickup_Community_Area == community_menu[which(community_menu$community == comm_area()), "area_num_1"])
+      targetCol <- "Dropoff_Community_Area"
     }
     if(comm_area() != 'City of Chicago' && direction() == 1){
       data_new <- subset(taxi_info,  Dropoff_Community_Area == community_menu[which(community_menu$community == comm_area()), "area_num_1"])
+      targetCol <- "Pickup_Community_Area"
     }
     if(company() != 'All Taxi Companies'){
       data_new <- subset(taxi_info,  CompanyNew == company_names[which(company_names$company == company()), "CompanyNew"])
@@ -606,6 +629,7 @@ server <- function(input, output, session) {
   
   output$RidesByCommArea <- renderPlot({
     #TODO - Add plot for percent of rides to/from each community area
+    
     
   })
   
