@@ -304,19 +304,19 @@ ui <- dashboardPage(
                                   #table showing the distribution of the number of rides by day of year (Jan 1 through Dec 31)
                                   fluidRow(
                                     box(title = textOutput("RidesByDateText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByDate"), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByDate", height = 300), style = "font-size:100%")
                                     )
                                   ),
                                   #table showing the distribution of the number of rides by hour of day based on start time (midnight through 11pm)
                                   fluidRow(
                                     box(title = textOutput("RidesByStartText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByStart"), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByStart", height = 300), style = "font-size:100%")
                                     )
                                   ),
                                   #table showing the distribution of the number of rides by day of week (Monday through Sunday)
                                   fluidRow(
                                     box(title = textOutput("RidesByWeekdayText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByWeekday"), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByWeekday", height = 300), style = "font-size:100%")
                                     )
                                   )
                            ),
@@ -324,19 +324,19 @@ ui <- dashboardPage(
                                   #table showing the distribution of the number of rides by month of year (Jan through Dec)
                                   fluidRow(
                                     box(title = textOutput("RidesByMonthText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByMonth"), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByMonth", height = 300), style = "font-size:100%")
                                     )
                                   ),
                                   #table showing the distribution of the number of rides by binned mileage (with an appropriate number of bins)
                                   fluidRow(
                                     box(title = textOutput("RidesByMileageText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByMileage"), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByMileage", height = 300), style = "font-size:100%")
                                     )
                                   ),
                                   #table showing the distribution of the number of rides by binned trip time (with an appropriate number of bins)
                                   fluidRow(
                                     box(title = textOutput("RidesByTimeText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByTime"), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByTime", height = 300), style = "font-size:100%")
                                     )
                                   )
                            )
