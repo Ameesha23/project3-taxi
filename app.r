@@ -13,7 +13,7 @@ library(leaflet)
 library(leaflet.providers)
 library(viridis)
 #library(measurements)
-#library(sf)
+library(sf)
 #remotes::install_github("willdebras/shinykeyboard")
 
 #get the file names with data
@@ -531,7 +531,7 @@ server <- function(input, output, session) {
   
   output$TableByStart <- DT::renderDataTable(
     DT::datatable({
-      #check if user wants time in 12 hour or 24 hour format
+      #check if user wants time in 12 hour or 24 hour format #TODO: change order according to AM/PM
       if(timeAs() == 0) {
         df_new <- setNames(count(taxi_info$Time_Twelve), c("Start Time", "Rides"))
       }
