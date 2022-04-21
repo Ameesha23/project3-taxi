@@ -256,103 +256,139 @@ ui <- dashboardPage(
                          #https://github.com/Emelieh21/shinykeyboard
                          ),
                        ),
-                column(6,
+                column(8,
                        fluidRow(
                          conditionalPanel(
                            condition = "input.viewTables == 0",
-                           column(6,
+                           fluidRow(
                                  #bar chart showing the distribution of the number of rides by day of year (Jan 1 through Dec 31)
+                                 column(4,
                                  fluidRow(
                                    style = "padding-left:20px",
                                    box(title = textOutput("RidesByDateText"), solidHeader = TRUE, status = "primary", width = 12,
                                        plotOutput("RidesByDate", height = 300)
                                    )
+                                 )
                                  ),
                                  #bar chart showing the distribution of the number of rides by hour of day based on start time (midnight through 11pm)
+                                 column(4,
                                  fluidRow(
                                    style = "padding-left:20px",
                                    box(title = textOutput("RidesByStartText"), solidHeader = TRUE, status = "primary", width = 12,
                                        plotOutput("RidesByStart", height = 300)
                                    )
+                                 )
                                  ),
                                  #bar chart showing the distribution of the number of rides by day of week (Monday through Sunday)
+                                 column(4,
                                  fluidRow(
                                    style = "padding-left:20px",
                                    box(title = textOutput("RidesByWeekdayText"), solidHeader = TRUE, status = "primary", width = 12,
                                        plotOutput("RidesByWeekday", height = 300)
                                    )
                                  )
+                                 )
                            ),
-                           column(6,
+                           fluidRow(
                                   #bar chart showing the distribution of the number of rides by month of year (Jan through Dec)
+                                  column(4,
                                   fluidRow(
                                     style = "padding-left:20px",
                                     box(title = textOutput("RidesByMonthText"), solidHeader = TRUE, status = "primary", width = 12,
                                         plotOutput("RidesByMonth", height = 300)
                                     )
+                                  )
                                   ),
                                   #bar chart showing the distribution of the number of rides by binned mileage (with an appropriate number of bins)
+                                  column(4,
                                   fluidRow(
                                     style = "padding-left:20px",
                                     box(title = textOutput("RidesByMileageText"), solidHeader = TRUE, status = "primary", width = 12,
                                         plotOutput("RidesByMileage", height = 300)
                                     )
+                                  )
                                   ),
                                   #bar chart showing the distribution of the number of rides by binned trip time (with an appropriate number of bins)
+                                  column(4,
                                   fluidRow(
                                     style = "padding-left:20px",
                                     box(title = textOutput("RidesByTimeText"), solidHeader = TRUE, status = "primary", width = 12,
                                         plotOutput("RidesByTime", height = 300)
                                     )
                                   )
+                                  )
+                           ),
+                           fluidRow(
+                             column(2),
+                             column(8,
+                                    fluidRow(
+                                      style = "padding-left:20px",
+                                      box(title = textOutput("RidesForCommArea"), solidHeader = TRUE, status = "primary", width = 12,
+                                          plotOutput("RidesByCommArea", height = 300)
+                                      )
+                                    )
+                             ),
+                             column(2)
                            )
                          ), #end of first, plots, conditionalPanel
                          conditionalPanel(
                            condition = "input.viewTables == 1",
-                           column(6,
+                           fluidRow(
                                   #table showing the distribution of the number of rides by day of year (Jan 1 through Dec 31)
+                                  column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByDateText2"), solidHeader = TRUE, status = "primary", width = 12,
                                         div(DT::dataTableOutput("TableByDate", height = 300), style = "font-size:100%")
                                     )
+                                  )
                                   ),
                                   #table showing the distribution of the number of rides by hour of day based on start time (midnight through 11pm)
+                                  column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByStartText2"), solidHeader = TRUE, status = "primary", width = 12,
                                         div(DT::dataTableOutput("TableByStart", height = 300), style = "font-size:100%")
                                     )
+                                  )
                                   ),
                                   #table showing the distribution of the number of rides by day of week (Monday through Sunday)
+                                  column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByWeekdayText2"), solidHeader = TRUE, status = "primary", width = 12,
                                         div(DT::dataTableOutput("TableByWeekday", height = 300), style = "font-size:100%")
                                     )
                                   )
+                                  )
                            ),
-                           column(6,
+                           fluidRow(
                                   #table showing the distribution of the number of rides by month of year (Jan through Dec)
+                                  column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByMonthText2"), solidHeader = TRUE, status = "primary", width = 12,
                                         div(DT::dataTableOutput("TableByMonth", height = 300), style = "font-size:100%")
                                     )
+                                  )
                                   ),
                                   #table showing the distribution of the number of rides by binned mileage (with an appropriate number of bins)
+                                  column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByMileageText2"), solidHeader = TRUE, status = "primary", width = 12,
                                         div(DT::dataTableOutput("TableByMileage", height = 300), style = "font-size:100%")
                                     )
+                                  )
                                   ),
                                   #table showing the distribution of the number of rides by binned trip time (with an appropriate number of bins)
+                                  column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByTimeText2"), solidHeader = TRUE, status = "primary", width = 12,
                                         div(DT::dataTableOutput("TableByTime", height = 300), style = "font-size:100%")
                                     )
                                   )
+                                  )
                            )
                          ) # end of second, tables, conditionalPanel
                        )
                 ),
-                column(5,
+                column(3,
                        align="center",
                        fluidRow(
                          style = "padding-left:20px",
@@ -436,6 +472,9 @@ server <- function(input, output, session) {
   })
   output$RidesByTimeText <- renderText({
     return(paste("Number of Rides By Trip Time"))
+  })
+  output$RidesForCommArea <- renderText({
+    return(paste("Percent of Rides To/From Selected Community Area"))
   })
   
   #text return functions for box table headers
@@ -565,6 +604,10 @@ server <- function(input, output, session) {
     
   })
   
+  output$RidesByCommArea <- renderPlot({
+    #TODO - Add plot for percent of rides to/from each community area
+    
+  })
   
   output$commMap <- renderLeaflet({
     marker_color = "#33647A"
