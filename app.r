@@ -401,13 +401,9 @@ server <- function(input, output, session) {
     if(comm_area() != ' ' && direction() == 1){
       data_new <- subset(taxi_info,  Dropoff_Community_Area == community_menu[which(community_menu$community == comm_area()), "area_num_1"])
     }
-    if(company() != ' ' && direction() == 0){
-      data_new <- subset(taxi_info,  Pickup_Community_Area == company_names[which(company_names$company == company()), "CompanyNew"])
+    if(company() != ' '){
+      data_new <- subset(taxi_info,  CompanyNew == company_names[which(company_names$company == company()), "CompanyNew"])
     }
-    if(company() != ' ' && direction() == 1){
-      data_new <- subset(taxi_info,  Dropoff_Community_Area == company_names[which(company_names$company == company()), "CompanyNew"])
-    }
-    
     data_new
   })
   
@@ -476,13 +472,13 @@ server <- function(input, output, session) {
     
     #check if user wants time in 12 hour or 24 hour format
     if(timeAs() == 0) {
-      m <- ggplot(taxi_info, aes(x=Time_Twelve)) + 
+      m <- ggplot(data_new(), aes(x=Time_Twelve)) + 
         geom_bar(stat="count", width=0.7, fill="#33647A") + 
         scale_y_continuous(labels = scales::comma) +
         labs(x = "Trip Start Time", y ="Rides")
     }
     else {
-      m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
+      m <- ggplot(data_new(), aes(x=Trip_Time)) + 
         geom_bar(stat="count", width=0.7, fill="#33647A") + 
         scale_y_continuous(labels = scales::comma) +
         labs(x = "Trip Start Time", y ="Rides")
