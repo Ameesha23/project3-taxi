@@ -58,8 +58,7 @@ community_menu <- rbind(new_row, community_menu)
 targetCol <- "Dropoff_Community_Area"
 
 #make a dataframe for taxicab companies and their abbreviations
-company_names <- data.frame(c('All Taxi Companies',
-                              'Blue Ribbon Taxi Association Inc.', 
+company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.', 
                               'Taxi Affiliation Services',
                               'Taxicab Insurance Agency, LLC', 
                               'Choice Taxi Association',
@@ -114,8 +113,7 @@ company_names <- data.frame(c('All Taxi Companies',
                               'Petani Cab Corp',
                               'U Taxicab', 
                               '3556 - 36214 RC Andrews Cab'),
-                            c('ALL',
-                              'BRTAI', 
+                            c('BRTAI', 
                               'TAS',
                               'TIAL', 
                               'CTA',
@@ -173,6 +171,8 @@ company_names <- data.frame(c('All Taxi Companies',
                               '33RCAC'))
 names(company_names) <- c("company", "CompanyNew")
 company_names <- company_names[order(company_names$company),]
+new_row <- c('All Taxi Companies','ALL')
+company_names <- rbind(new_row, company_names)   
 
 print(head(taxi_info))
 print(head(community_menu))
@@ -284,7 +284,7 @@ ui <- dashboardPage(
                                  fluidRow(
                                    style = "padding-left:20px",
                                    box(title = textOutput("RidesByDateText"), solidHeader = TRUE, status = "primary", width = 12,
-                                       plotOutput("RidesByDate", height = 300)
+                                       plotOutput("RidesByDate", height = 350)
                                    )
                                  )
                                  ),
@@ -293,7 +293,7 @@ ui <- dashboardPage(
                                  fluidRow(
                                    style = "padding-left:20px",
                                    box(title = textOutput("RidesByStartText"), solidHeader = TRUE, status = "primary", width = 12,
-                                       plotOutput("RidesByStart", height = 300)
+                                       plotOutput("RidesByStart", height = 350)
                                    )
                                  )
                                  ),
@@ -302,7 +302,7 @@ ui <- dashboardPage(
                                  fluidRow(
                                    style = "padding-left:20px",
                                    box(title = textOutput("RidesByWeekdayText"), solidHeader = TRUE, status = "primary", width = 12,
-                                       plotOutput("RidesByWeekday", height = 300)
+                                       plotOutput("RidesByWeekday", height = 350)
                                    )
                                  )
                                  )
@@ -313,7 +313,7 @@ ui <- dashboardPage(
                                   fluidRow(
                                     style = "padding-left:20px",
                                     box(title = textOutput("RidesByMonthText"), solidHeader = TRUE, status = "primary", width = 12,
-                                        plotOutput("RidesByMonth", height = 300)
+                                        plotOutput("RidesByMonth", height = 350)
                                     )
                                   )
                                   ),
@@ -322,7 +322,7 @@ ui <- dashboardPage(
                                   fluidRow(
                                     style = "padding-left:20px",
                                     box(title = textOutput("RidesByMileageText"), solidHeader = TRUE, status = "primary", width = 12,
-                                        plotOutput("RidesByMileage", height = 300)
+                                        plotOutput("RidesByMileage", height = 350)
                                     )
                                   )
                                   ),
@@ -331,7 +331,7 @@ ui <- dashboardPage(
                                   fluidRow(
                                     style = "padding-left:20px",
                                     box(title = textOutput("RidesByTimeText"), solidHeader = TRUE, status = "primary", width = 12,
-                                        plotOutput("RidesByTime", height = 300)
+                                        plotOutput("RidesByTime", height = 350)
                                     )
                                   )
                                   )
@@ -342,7 +342,7 @@ ui <- dashboardPage(
                                     fluidRow(
                                       style = "padding-left:20px",
                                       box(title = textOutput("RidesForCommArea"), solidHeader = TRUE, status = "primary", width = 12,
-                                          plotOutput("RidesByCommArea", height = 300)
+                                          plotOutput("RidesByCommArea", height = 350)
                                       )
                                     )
                              ),
@@ -356,7 +356,7 @@ ui <- dashboardPage(
                                   column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByDateText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByDate", height = 300), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByDate", height = 350), style = "font-size:100%")
                                     )
                                   )
                                   ),
@@ -364,7 +364,7 @@ ui <- dashboardPage(
                                   column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByStartText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByStart", height = 300), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByStart", height = 350), style = "font-size:100%")
                                     )
                                   )
                                   ),
@@ -372,7 +372,7 @@ ui <- dashboardPage(
                                   column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByWeekdayText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByWeekday", height = 300), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByWeekday", height = 350), style = "font-size:100%")
                                     )
                                   )
                                   )
@@ -382,7 +382,7 @@ ui <- dashboardPage(
                                   column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByMonthText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByMonth", height = 300), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByMonth", height = 350), style = "font-size:100%")
                                     )
                                   )
                                   ),
@@ -390,7 +390,7 @@ ui <- dashboardPage(
                                   column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByMileageText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByMileage", height = 300), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByMileage", height = 350), style = "font-size:100%")
                                     )
                                   )
                                   ),
@@ -398,7 +398,7 @@ ui <- dashboardPage(
                                   column(4,
                                   fluidRow(
                                     box(title = textOutput("RidesByTimeText2"), solidHeader = TRUE, status = "primary", width = 12,
-                                        div(DT::dataTableOutput("TableByTime", height = 300), style = "font-size:100%")
+                                        div(DT::dataTableOutput("TableByTime", height = 350), style = "font-size:100%")
                                     )
                                   )
                                   )
@@ -646,10 +646,29 @@ server <- function(input, output, session) {
     
   })
   
+  
+  
   output$RidesByCommArea <- renderPlot({
     #TODO - Add plot for percent of rides to/from each community area
-    
-    
+    #percentage of rides to each community area from selected community area
+    if(direction() == 0){
+      #count the dropoffs in other community areas
+      df_new<- setNames(count(data_new()$Dropoff_Community_Area), c("area_num_1", "Rides"))
+    }
+    #percentage of rides from each community area to selected community area
+    if(direction() == 1){
+      df_new<- setNames(count(data_new()$Pickup_Community_Area), c("area_num_1", "Rides"))
+    }
+    df_new<-merge(df_new, community_menu, by = "area_num_1")
+    sums <- sum(as.numeric(df_new$Rides))
+    m <- ggplot(df_new, aes(x=community, y = (Rides/sums)*100)) + 
+      geom_bar(stat="identity", width=0.7, fill="#33647A") + 
+      scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+      labs(x = "Community Area", y ="Rides")+
+      theme_bw() +
+      theme(text = element_text(family = "sans", face = "bold")) +
+      theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+    m
   })
   
   output$commMap <- renderLeaflet({

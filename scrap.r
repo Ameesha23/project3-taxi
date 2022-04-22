@@ -59,6 +59,7 @@ community_menu <- data.frame(chi_map$community, chi_map$area_num_1)
 names(community_menu) <- c("community", "area_num_1")
 community_menu <- community_menu[order(community_menu$community),]
 print(community_menu[which(community_menu$community == "ALBANY PARK"), "area_num_1"])
+head(community_menu)
 
 #make a dataframe for taxicab companies and their abbreviations
 company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.', 
@@ -181,8 +182,22 @@ taxi_info$TimeNew <- format(strptime(taxi_info$Trip_Time, '%H'), '%I %p')
 head(taxi_info)
 str(taxi_info)
 taxi_info[2000:2025,]
-df_new<- setNames(count(taxi_info$wday), c("Day", "Rides"))
-min(df_new$Rides)
+df_new<- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))
+df_new<-merge(df_new, community_menu, by = "area_num_1")
+head(df_new)
+sums <- sum(as.numeric(df_new$Rides))
+sums
+
+
+m <- ggplot(df_new, aes(x=community, y = (Rides/sums)*100)) + 
+  geom_bar(stat="identity", width=0.7, fill="#33647A") + 
+  scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+  labs(x = "Trip Start Time", y ="Rides")+
+  theme_bw() +
+  theme(text = element_text(family = "sans", face = "bold")) +
+  theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
+m
+
 
 
 
