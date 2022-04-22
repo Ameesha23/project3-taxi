@@ -530,7 +530,8 @@ server <- function(input, output, session) {
     #change plot based on community area
     m <- ggplot(data_new(), aes(x=Trip_Date, fill = month)) + 
       geom_bar(stat="count", width=0.7, show.legend = FALSE) + 
-      scale_y_continuous(labels = scales::comma) +
+      scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+      scale_x_date(date_breaks = "1 month", date_labels = "%B") +
       labs(x = "Trip Date", y ="Rides") + 
       theme_bw() +
       theme(text = element_text(family = "sans", face = "bold")) +
@@ -545,13 +546,13 @@ server <- function(input, output, session) {
     if(timeAs() == 0) {
       m <- ggplot(data_new(), aes(x=Time_Twelve)) + 
         geom_bar(stat="count", width=0.7, fill="#33647A") + 
-        scale_y_continuous(labels = scales::comma) +
+        scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
         labs(x = "Trip Start Time", y ="Rides")
     }
     else {
       m <- ggplot(data_new(), aes(x=Trip_Time)) + 
-        geom_bar(stat="count", width=0.7, fill="#33647A") + 
-        scale_y_continuous(labels = scales::comma) +
+        geom_bar(stat="count", width=0.7, fill="#33647A", breaks = scales::pretty_breaks(n = 10)) + 
+        scale_y_continuous(labels = scales::comma, ) +
         labs(x = "Trip Start Time", y ="Rides")
     }
     
@@ -564,9 +565,9 @@ server <- function(input, output, session) {
   })
   
   output$RidesByWeekday <- renderPlot({
-    m <- ggplot(taxi_info, aes(x=wday)) + 
+    m <- ggplot(data_new(), aes(x=wday)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma) +
+      scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
       labs(x = "Weekday", y ="Rides") + 
       theme_bw() +
       theme(text = element_text(family = "sans", face = "bold")) +
@@ -575,9 +576,9 @@ server <- function(input, output, session) {
   })
   
   output$RidesByMonth <- renderPlot({
-    m <- ggplot(taxi_info, aes(x=month)) + 
+    m <- ggplot(data_new(), aes(x=month)) + 
       geom_bar(stat="count", width=0.7, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma) +
+      scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
       labs(x = "Month", y ="Rides") + 
       theme_bw() +
       theme(text = element_text(family = "sans", face = "bold")) +
@@ -592,15 +593,15 @@ server <- function(input, output, session) {
     
     #check if user wants distance in mi or km
     if(miles() == 0) {
-      m <- ggplot(taxi_info, aes(x=Trip_Miles)) + 
+      m <- ggplot(data_new(), aes(x=Trip_Miles)) + 
         geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
-        scale_y_continuous(labels = scales::comma) +
+        scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
         labs(x = "Trip Distance (Miles)", y ="Rides")
     }
     else {
-      m <- ggplot(taxi_info, aes(x=Trip_km)) + 
+      m <- ggplot(data_new(), aes(x=Trip_km)) + 
         geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
-        scale_y_continuous(labels = scales::comma) +
+        scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
         labs(x = "Trip Distance (Kilometers)", y ="Rides")
     }
     
@@ -616,9 +617,9 @@ server <- function(input, output, session) {
   #TODO logarithmic binning
   output$RidesByTime <- renderPlot({
     # TODO: add space between bars + find better division of bins
-    m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
+    m <- ggplot(data_new(), aes(x=Trip_Seconds)) + 
       geom_bar(stat="bin", binwidth = 300, fill="#33647A") + 
-      scale_y_continuous(labels = scales::comma) +
+      scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
       labs(x = "Total Trip Time (Seconds)", y ="Rides") + 
       theme_bw() +
       theme(text = element_text(family = "sans", face = "bold")) +
@@ -648,7 +649,7 @@ server <- function(input, output, session) {
   
   output$TableByDate <- DT::renderDataTable(
     DT::datatable({ 
-      df_new<- setNames(count(taxi_info$TripDate), c("Date", "Rides"))
+      df_new<- setNames(count(data_new()$TripDate), c("Date", "Rides"))
       df_new
     }, 
     options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
@@ -660,10 +661,10 @@ server <- function(input, output, session) {
     DT::datatable({
       #check if user wants time in 12 hour or 24 hour format #TODO: change order according to AM/PM
       if(timeAs() == 0) {
-        df_new <- setNames(count(taxi_info$Time_Twelve), c("Start Time", "Rides"))
+        df_new <- setNames(count(data_new()$Time_Twelve), c("Start Time", "Rides"))
       }
       else {
-        df_new <- setNames(count(taxi_info$Trip_Time), c("Start Time", "Rides"))
+        df_new <- setNames(count(data_new()$Trip_Time), c("Start Time", "Rides"))
       }
       
       df_new
@@ -675,7 +676,7 @@ server <- function(input, output, session) {
   
   output$TableByWeekday <- DT::renderDataTable(
     DT::datatable({ 
-      df_new<- setNames(count(taxi_info$wday), c("Day", "Rides"))
+      df_new<- setNames(count(data_new()$wday), c("Day", "Rides"))
       df_new
     }, 
     options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
@@ -685,7 +686,7 @@ server <- function(input, output, session) {
   
   output$TableByMonth <- DT::renderDataTable(
     DT::datatable({ 
-      df_new<- setNames(count(taxi_info$month), c("Month", "Rides"))
+      df_new<- setNames(count(data_new()$month), c("Month", "Rides"))
       df_new
     }, 
     options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))
@@ -697,10 +698,10 @@ server <- function(input, output, session) {
     DT::datatable({
       #check if user wants distance in mi or km
       if(miles() == 0) {
-        df_new<- setNames(count(taxi_info$Trip_Miles), c("Trip Miles", "Rides"))
+        df_new<- setNames(count(data_new()$Trip_Miles), c("Trip Miles", "Rides"))
       }
       else {
-        df_new<- setNames(count(taxi_info$Trip_km), c("Trip Kilometers", "Rides"))
+        df_new<- setNames(count(data_new()$Trip_km), c("Trip Kilometers", "Rides"))
       }
       df_new
     }, 
@@ -711,7 +712,7 @@ server <- function(input, output, session) {
   
   output$TableByTime <- DT::renderDataTable(
     DT::datatable({ 
-      df_new<- setNames(count(taxi_info$Trip_Seconds), c("Trip Time (Seconds)", "Rides"))
+      df_new<- setNames(count(data_new()$Trip_Seconds), c("Trip Time (Seconds)", "Rides"))
       df_new
     }, 
     options = list(searching = FALSE, pageLength = 7, lengthChange = FALSE, order = list(list(0, 'asc'))

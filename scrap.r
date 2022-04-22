@@ -181,17 +181,26 @@ taxi_info$TimeNew <- format(strptime(taxi_info$Trip_Time, '%H'), '%I %p')
 head(taxi_info, 100)
 tail(taxi_info)
 taxi_info[2000:2025,]
+df_new<- setNames(count(taxi_info$wday), c("Day", "Rides"))
+min(df_new$Rides)
 
 
-m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
-  geom_bar(stat="bin", binwidth = 300, fill="#33647A", width = 0.98) + 
-  scale_y_continuous(labels = scales::comma) +
-  labs(x = "Total Trip Time (Seconds)", y ="Rides") + 
+
+col <- c("#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6")
+
+
+#change plot based on community area
+m <- ggplot(taxi_info, aes(x=Trip_Date, fill = month)) + 
+  geom_bar(stat="count", width=0.7, show.legend = FALSE) + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%B") +
+  scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+  labs(x = "Trip Date", y ="Rides") + 
   theme_bw() +
   theme(text = element_text(family = "sans", face = "bold")) +
-  theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
+  theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))+
+  scale_fill_manual(values = col)
 m
-
+m
 m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + geom_histogram(bins=15) + geom_bar(width = 0.9)
 m
 
