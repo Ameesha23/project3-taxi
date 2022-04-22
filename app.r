@@ -244,16 +244,32 @@ ui <- dashboardPage(
                          radioButtons("timeAs", h4("View Time As:"),
                                       choices = list("12Hr" = 0, 
                                                      "24Hr" = 1),selected = 0),
+                         radioButtons("selectionFilter", h4("Filter by Community Area or by Cab Company:"),
+                                     choices = list("Community Area" = 0,
+                                                    "Company" = 1)),
+                         HTML("<br>"),
                          
-                         selectInput("comm_area", h5("Select Community Area"), 
-                                     community_menu$community, selected = 'City of Chicago'),
+                         conditionalPanel(
+                           condition = "input.selectionFilter == 0",
+                           fluidRow(
+                             selectInput("comm_area", "Select Community Area", 
+                                         community_menu$community, selected = 'City of Chicago'),
+                             radioButtons("direction", "Rides FROM or TO the Community Area",
+                                          choices = list("From" = 0, 
+                                                         "To" = 1),selected = 0),
+                           ),
+                         ),
+                         conditionalPanel(
+                           condition = "input.selectionFilter == 1",
+                           fluidRow(
+                             selectInput("company", "Select Taxicab Company", 
+                                         company_names$company, selected = 'All Taxi Companies'),
+                             radioButtons("direction", "Rides FROM or TO the Community Area",
+                                          choices = list("From" = 0, 
+                                                         "To" = 1),selected = 0),
+                           )
+                         )
                          
-                         radioButtons("direction", "Rides FROM or TO the Community Area",
-                                      choices = list("From" = 0, 
-                                                     "To" = 1),selected = 0),
-                         
-                         selectInput("company", h4("Select Taxicab Company"), 
-                                     company_names$company, selected = 'All Taxi Companies'),
                          #TODO add virtual keyboard
                          #https://github.com/Emelieh21/shinykeyboard
                          ),
