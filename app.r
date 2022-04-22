@@ -544,13 +544,15 @@ server <- function(input, output, session) {
     
     #check if user wants time in 12 hour or 24 hour format
     if(timeAs() == 0) {
-      m <- ggplot(data_new(), aes(x=Time_Twelve)) + 
+      time_twelve <- factor(data_new()$Time_Twelve, level = c('12 AM', '01 AM', '02 AM', '03 AM', '04 AM', '05 AM', '06 AM', '07 AM', '08 AM', '09 AM', '10 AM', '11 AM', '12 PM', '01 PM', '02 PM', '03 PM', '04 PM', '05 PM', '06 PM', '07 PM', '08 PM', '09 PM', '10 PM', '11 PM'))
+      m <- ggplot(data_new(), aes(x=time_twelve)) + 
         geom_bar(stat="count", width=0.7, fill="#33647A") + 
         scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
         labs(x = "Trip Start Time", y ="Rides")
     }
     else {
       m <- ggplot(data_new(), aes(x=Trip_Time)) + 
+        scale_x_continuous(breaks=seq(0,23,1)) +
         geom_bar(stat="count", width=0.7, fill="#33647A", breaks = scales::pretty_breaks(n = 10)) + 
         scale_y_continuous(labels = scales::comma, ) +
         labs(x = "Trip Start Time", y ="Rides")
