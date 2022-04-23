@@ -639,6 +639,15 @@ server <- function(input, output, session) {
     m <- addTiles(m)
     m <- addProviderTiles(m, provider = "CartoDB.Positron")
     
+    selectedData <- data_new()
+    
+    totalRidesHere <- nrow(selectedData)
+    
+    countsPerArea <- count(selectedData, targetCol)
+    countsPerArea$Percent <- (countsPerArea$freq / totalRidesHere)*100
+    
+    binpal <- colorBin("YlOrRd", countsPerArea$Percent, 8)
+    
     m <- addPolygons(m, color = "#444444", weight = 1, smoothFactor = 0.5,
                 opacity = 1.0, fillOpacity = 0.5)
     

@@ -8,8 +8,8 @@ library(jpeg)
 library(grid)
 library(leaflet)
 library(scales)
-library(dplyr)
 library(plyr)
+library(dplyr)
 library(readr)
 library(leaflet)
 library(leaflet.providers)
@@ -48,7 +48,10 @@ chi_map$area_num_1 = as.numeric(chi_map$area_num_1)
 pickup_map <- left_join(chi_map, pickups_comm, by = ("area_num_1"))
 dropoff_map <- left_join(chi_map, drop_comm, by = ("area_num_1"))
 
+chi_map <- chi_map[order(chi_map$area_num_1),]
+
 print(typeof(chi_map))
+head(chi_map)
 
 #read using rgdal
 chiMapSP <- rgdal::readOGR("https://raw.githubusercontent.com/thisisdaryn/data/master/geo/chicago/Comm_Areas.geojson")
@@ -216,3 +219,51 @@ leaflet(chi_map) %>%
   addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
               opacity = 1.0, fillOpacity = 0.5) %>%
   addLegend(pal = pal, values = c(10,20,30), opacity = 1.0)
+
+
+#testing selecting specific area
+data_new <- subset(taxi_info,  Pickup_Community_Area == 2)
+targetCol <- "Dropoff_Community_Area"
+
+print(subset(data_new, select = "Dropoff_Community_Area"))
+print(data_new[data_new$Dropoff_Community_Area == 52, ])
+
+totalRidesHere <- nrow(data_new)
+print(totalRidesHere)
+defaultCA <- data.frame(1:77, 0)
+names(defaultCA) <- c("Dropoff_Community_Area", "freq")
+head(defaultCA, 80)
+
+countsPerArea <- count(data_new, targetCol)
+
+newDF <- data.frame()
+
+for(x in 1:77) {
+  if (x %in% countsPerArea) {
+    newDF[nrow(newDF)+1,] = c(x, countsPerArea)
+  }
+}
+
+head(countsPerArea$Dropoff_Community_Area, countsPerArea$freq, 80)
+#countsPerArea <- count(data_new, targetCol)
+head(countsPerArea,80)
+countsPerArea$Percent <- (countsPerArea$freq / totalRidesHere)*100
+head(data_new)
+#using table to count:
+countsArea <- as.data.frame(group_by(data_new, Dropoff_Community_Area) %>%
+              dplyr::summarise(freq=n()) %>%
+  ungroup() %>%
+  tidyr::complete(Dropoff_Community_Area,
+           fill = list(N = 0)))
+#countsArea <- data.frame(table(data_new$Dropoff_Community_Area))
+head(countsArea, 80)
+
+binpal <- colorBin("YlOrRd", countsPerArea$Percent, 8)
+
+leaflet(chi_map) %>%
+  addTiles() %>%
+  addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+              opacity = 1.0, fillOpacity = 0.8, fillColor = ~binpal(countsPerArea$Percent)) %>%
+  addLegend(pal = binpal, values = countsPerArea$Percent, opacity = 1.0)
+
+head(countsPerArea, 80)
