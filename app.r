@@ -709,12 +709,12 @@ server <- function(input, output, session) {
     #calculate and add percent of rides
     countsPerArea$Percent <- (countsPerArea$freq / totalRidesHere)*100
     
-    binpal <- colorBin("YlOrRd", countsPerArea$Percent, 6)
+    binpal <- colorBin("PuBu", countsPerArea$Percent, 6)
     
   
     leaflet(chi_map) %>%
       addTiles() %>%
-      addProviderTiles(provider = "CartoDB.Positron") %>%
+      #addProviderTiles(provider = "CartoDB.Positron") %>%
       addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
                   opacity = 1.0, fillOpacity = 0.8, fillColor = ~binpal(countsPerArea$Percent)) %>%
       addLegend(pal = binpal, values = countsPerArea$Percent, title = "Percentage of Rides for Each Area", labFormat = labelFormat(suffix = "%"), opacity = 1.0)
