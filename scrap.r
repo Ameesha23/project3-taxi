@@ -62,6 +62,7 @@ community_menu <- data.frame(chi_map$community, chi_map$area_num_1)
 names(community_menu) <- c("community", "area_num_1")
 community_menu <- community_menu[order(community_menu$community),]
 print(community_menu[which(community_menu$community == "ALBANY PARK"), "area_num_1"])
+head(community_menu)
 
 #make a dataframe for taxicab companies and their abbreviations
 company_names <- data.frame(c('Blue Ribbon Taxi Association Inc.', 
@@ -181,20 +182,42 @@ head(company_names)
 
 #convert from 24hr to 12hr am/pm
 taxi_info$TimeNew <- format(strptime(taxi_info$Trip_Time, '%H'), '%I %p')
-head(taxi_info, 100)
-tail(taxi_info)
+head(taxi_info)
+str(taxi_info)
 taxi_info[2000:2025,]
+df_new<- setNames(count(taxi_info$Dropoff_Community_Area), c("area_num_1", "Rides"))
+df_new<-merge(df_new, community_menu, by = "area_num_1")
+head(df_new)
+sums <- sum(as.numeric(df_new$Rides))
+sums
 
 
-m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + 
-  geom_bar(stat="bin", binwidth = 300, fill="#33647A", width = 0.98) + 
-  scale_y_continuous(labels = scales::comma) +
-  labs(x = "Total Trip Time (Seconds)", y ="Rides") + 
+m <- ggplot(df_new, aes(x=community, y = (Rides/sums)*100)) + 
+  geom_bar(stat="identity", width=0.7, fill="#33647A") + 
+  scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+  labs(x = "Trip Start Time", y ="Rides")+
   theme_bw() +
   theme(text = element_text(family = "sans", face = "bold")) +
   theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
 m
 
+
+
+
+col <- c("#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6", "#3e6a7f", "#749aa6")
+
+time_twelve <- factor(taxi_info$TimeNew, level = c('12 AM', '01 AM', '02 AM', '03 AM', '04 AM', '05 AM', '06 AM', '07 AM', '08 AM', '09 AM', '10 AM', '11 AM', '12 PM', '01 PM', '02 PM', '03 PM', '04 PM', '05 PM', '06 PM', '07 PM', '08 PM', '09 PM', '10 PM', '11 PM'))
+#change plot based on community area
+m <- ggplot(taxi_info, aes(x=Trip_Time)) + 
+  geom_bar(stat="count", width=0.7, fill="#33647A") + 
+  scale_x_continuous(breaks=seq(0,23,1)) +
+  scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+  labs(x = "Trip Start Time", y ="Rides")+
+  theme_bw() +
+  theme(text = element_text(family = "sans", face = "bold")) +
+  theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
+m
+m
 m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + geom_histogram(bins=15) + geom_bar(width = 0.9)
 m
 
