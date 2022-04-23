@@ -16,6 +16,9 @@ library(viridis)
 library(sf)
 #remotes::install_github("willdebras/shinykeyboard")
 
+#display five digits for all numbers 
+options(digits = 5)              
+
 #get the file names with data
 files = list.files(pattern="*.csv", full.name = T)
 
@@ -474,7 +477,7 @@ server <- function(input, output, session) {
     }
     
   })
-  
+
   #register map click and update selectInput
   observeEvent(input$commMap_shape_click, {
     click <- input$commMap_shape_click
@@ -482,7 +485,7 @@ server <- function(input, output, session) {
     updateSelectInput(session, "comm_area", "Select Community Area", community_menu$community, selected = click$id)    
     #print(comm_area())
   })
-  
+
   #TODO change to independant
   data_new<-reactive({
     if(comm_area() == 'City of Chicago' || company() == 'All Taxi Companies'){
@@ -501,6 +504,7 @@ server <- function(input, output, session) {
     }
     data_new
   })
+  
   
   
   #text return functions for box plot headers
@@ -673,6 +677,7 @@ server <- function(input, output, session) {
     sums <- sum(as.numeric(df_new$Rides))
     m <- ggplot(df_new, aes(x=community, y = (Rides/sums)*100)) + 
       geom_bar(stat="identity", width=0.7, fill="#33647A") + 
+      geom_text(aes(label = sprintf("%0.2f", round((Rides/sums)*100, digits = 2))), vjust = -0.2) +
       scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
       labs(x = "Community Area", y ="Rides")+
       theme_bw() +
@@ -712,12 +717,12 @@ server <- function(input, output, session) {
     #calculate and add percent of rides
     countsPerArea$Percent <- (countsPerArea$freq / totalRidesHere)*100
     
-    binpal <- colorBin("YlOrRd", countsPerArea$Percent, 6)
+    binpal <- colorBin("PuBu", countsPerArea$Percent, 6)
     
   
     leaflet(chi_map) %>%
       addTiles() %>%
-      addProviderTiles(provider = "CartoDB.Positron") %>%
+      #addProviderTiles(provider = "CartoDB.Positron") %>%
       addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
                   opacity = 1.0, fillOpacity = 0.8, fillColor = ~binpal(countsPerArea$Percent), label = ~community,
                   highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE), layerId = ~community) %>%
