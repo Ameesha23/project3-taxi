@@ -245,46 +245,49 @@ leaflet(chi_map) %>%
 
 
 #testing selecting specific area
-data_new <- subset(taxi_info,  Pickup_Community_Area == 2)
-targetCol <- "Dropoff_Community_Area"
+data_new <- subset(taxi_info,  Dropoff_Community_Area == 2)
+targetCol <- "Pickup_Community_Area"
 
-print(subset(data_new, select = "Dropoff_Community_Area"))
-print(data_new[data_new$Dropoff_Community_Area == 52, ])
+#print(subset(data_new, select = "Dropoff_Community_Area"))
+#print(data_new[data_new$Dropoff_Community_Area == 52, ])
+#print(77 %in% data_new$Dropoff_Community_Area)
 
 totalRidesHere <- nrow(data_new)
 print(totalRidesHere)
-defaultCA <- data.frame(1:77, 0)
-names(defaultCA) <- c("Dropoff_Community_Area", "freq")
-head(defaultCA, 80)
 
 countsPerArea <- count(data_new, targetCol)
-
-newDF <- data.frame()
+head(countsPerArea,80)
 
 for(x in 1:77) {
-  if (x %in% countsPerArea) {
-    newDF[nrow(newDF)+1,] = c(x, countsPerArea)
+  if (!(x %in% countsPerArea$Pickup_Community_Area)) {
+    #newDF[nrow(newDF)+1,] = c(x, countsPerArea)
+    countsPerArea<-rbind(countsPerArea, data.frame(Pickup_Community_Area=x,freq=0))
   }
 }
 
-head(countsPerArea$Dropoff_Community_Area, countsPerArea$freq, 80)
-#countsPerArea <- count(data_new, targetCol)
 head(countsPerArea,80)
-countsPerArea$Percent <- (countsPerArea$freq / totalRidesHere)*100
-head(data_new)
-#using table to count:
-countsArea <- as.data.frame(group_by(data_new, Dropoff_Community_Area) %>%
-              dplyr::summarise(freq=n()) %>%
-  ungroup() %>%
-  tidyr::complete(Dropoff_Community_Area,
-           fill = list(N = 0)))
-#countsArea <- data.frame(table(data_new$Dropoff_Community_Area))
-head(countsArea, 80)
 
-binpal <- colorBin("YlOrRd", countsPerArea$Percent, 8)
+countsPerArea <- countsPerArea[order(countsPerArea$Pickup_Community_Area),]
+head(countsPerArea, 80)
+
+countsPerArea$Percent <- (countsPerArea$freq / totalRidesHere)*100
+head(countsPerArea,80)
+
+# head(data_new)
+# #using table to count:
+# countsArea <- as.data.frame(group_by(data_new, Dropoff_Community_Area) %>%
+#               dplyr::summarise(freq=n()) %>%
+#   ungroup() %>%
+#   tidyr::complete(Dropoff_Community_Area,
+#            fill = list(N = 0)))
+# countsArea <- data.frame(table(data_new$Dropoff_Community_Area))
+# head(countsArea, 80)
+
+binpal <- colorBin("YlOrRd", countsPerArea$Percent, 6)
 
 leaflet(chi_map) %>%
   addTiles() %>%
+  addProviderTiles(provider = "CartoDB.Positron") %>%
   addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
               opacity = 1.0, fillOpacity = 0.8, fillColor = ~binpal(countsPerArea$Percent)) %>%
   addLegend(pal = binpal, values = countsPerArea$Percent, opacity = 1.0)

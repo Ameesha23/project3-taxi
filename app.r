@@ -55,6 +55,9 @@ community_menu <- community_menu[order(community_menu$community),]
 new_row <- c('City of Chicago','0')
 community_menu <- rbind(new_row, community_menu)   
 
+#re-order shapefile features so community areas are in order
+chi_map <- chi_map[order(chi_map$area_num_1),]
+
 targetCol <- "Dropoff_Community_Area"
 
 #make a dataframe for taxicab companies and their abbreviations
@@ -673,23 +676,45 @@ server <- function(input, output, session) {
   
   output$commMap <- renderLeaflet({
     marker_color = "#33647A"
-    m <- leaflet(chi_map)
-    m <- addTiles(m)
-    m <- addProviderTiles(m, provider = "CartoDB.Positron")
     
     selectedData <- data_new()
-    
     totalRidesHere <- nrow(selectedData)
     
-    countsPerArea <- count(selectedData, targetCol)
+    #calculate total rides for each area
+    
+    if (direction() == 0) {
+      countsPerArea <- count(selectedData, "Dropoff_Community_Area")  
+    }
+    
+    if (direction() == 1) {
+      countsPerArea <- count(selectedData, "Pickup_Community_Area")  
+      
+    }
+    
+    names(countsPerArea)[1] <- 'area'
+    
+    #add in missing data
+    for(x in 1:77) {
+      if (!(x %in% countsPerArea$area)) {
+        countsPerArea<-rbind(countsPerArea, data.frame(area=x,freq=0))
+      }
+    }
+    
+    #order all areas from 1-77
+    countsPerArea <- countsPerArea[order(countsPerArea$area),]
+    #calculate and add percent of rides
     countsPerArea$Percent <- (countsPerArea$freq / totalRidesHere)*100
     
-    binpal <- colorBin("YlOrRd", countsPerArea$Percent, 8)
+    binpal <- colorBin("YlOrRd", countsPerArea$Percent, 6)
     
-    m <- addPolygons(m, color = "#444444", weight = 1, smoothFactor = 0.5,
-                opacity = 1.0, fillOpacity = 0.5)
+  
+    leaflet(chi_map) %>%
+      addTiles() %>%
+      addProviderTiles(provider = "CartoDB.Positron") %>%
+      addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+                  opacity = 1.0, fillOpacity = 0.8, fillColor = ~binpal(countsPerArea$Percent)) %>%
+      addLegend(pal = binpal, values = countsPerArea$Percent, title = "Percentage of Rides for Each Area", labFormat = labelFormat(suffix = "%"), opacity = 1.0)
     
-    m
     
   })
   
