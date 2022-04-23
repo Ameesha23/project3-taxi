@@ -270,7 +270,7 @@ ui <- dashboardPage(
                            fluidRow(
                              selectInput("company", "Select Taxicab Company", 
                                          company_names$company, selected = 'All Taxi Companies'),
-                             radioButtons("direction", "Rides FROM or TO the Community Area",
+                             radioButtons("direction2", "Rides Given FROM or TO Each Community Area By Taxi Company",
                                           choices = list("From" = 0, 
                                                          "To" = 1),selected = 0),
                            )
@@ -455,8 +455,16 @@ server <- function(input, output, session) {
     input$direction
   })
   
+  direction2<-reactive({
+    input$direction2
+  })
+  
   company<-reactive({
     input$company
+  })
+  
+  filterType<-reactive({
+    input$selectionFilter
   })
   
   
@@ -482,7 +490,11 @@ server <- function(input, output, session) {
   observeEvent(input$commMap_shape_click, {
     click <- input$commMap_shape_click
     #print(click)
-    updateSelectInput(session, "comm_area", "Select Community Area", community_menu$community, selected = click$id)    
+    updateSelectInput(session, "comm_area", "Select Community Area", community_menu$community, selected = click$id)
+    updateRadioButtons(session, "selectionFilter", "Filter by Community Area or by Cab Company:",
+                 choices = list("Community Area" = 0,
+                                "Company" = 1), selected = 0)
+
     #print(comm_area())
   })
 
@@ -625,13 +637,13 @@ server <- function(input, output, session) {
     
     #check if user wants distance in mi or km
     if(miles() == 0) {
-      m <- ggplot(data_new(), aes(x=Trip_Miles)) + 
+      m <- ggplot(data_new(), aes(x=Trip_Miles, width=0.75)) + 
         geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
         scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
         labs(x = "Trip Distance (Miles)", y ="Rides")
     }
     else {
-      m <- ggplot(data_new(), aes(x=Trip_km)) + 
+      m <- ggplot(data_new(), aes(x=Trip_km, width=0.75)) + 
         geom_bar(stat="bin", binwidth = 5, fill="#33647A") + 
         scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
         labs(x = "Trip Distance (Kilometers)", y ="Rides")
@@ -649,7 +661,7 @@ server <- function(input, output, session) {
   #TODO logarithmic binning
   output$RidesByTime <- renderPlot({
     # TODO: add space between bars + find better division of bins
-    m <- ggplot(data_new(), aes(x=Trip_Seconds)) + 
+    m <- ggplot(data_new(), aes(x=Trip_Seconds, width=0.75)) + 
       geom_bar(stat="bin", binwidth = 300, fill="#33647A") + 
       scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
       labs(x = "Total Trip Time (Seconds)", y ="Rides") + 
@@ -665,14 +677,38 @@ server <- function(input, output, session) {
   output$RidesByCommArea <- renderPlot({
     #TODO - Add plot for percent of rides to/from each community area
     #percentage of rides to each community area from selected community area
-    if(direction() == 0){
-      #count the dropoffs in other community areas
-      df_new<- setNames(count(data_new()$Dropoff_Community_Area), c("area_num_1", "Rides"))
+    
+    if (filterType() == 0 || (filterType() == 1 && company() == 'All Taxi Companies')) {
+      if(direction() == 0){
+        #count the dropoffs in other community areas
+        df_new<- setNames(count(data_new()$Dropoff_Community_Area), c("area_num_1", "Rides"))
+      }
+      #percentage of rides from each community area to selected community area
+      if(direction() == 1){
+        df_new<- setNames(count(data_new()$Pickup_Community_Area), c("area_num_1", "Rides"))
+      }  
     }
-    #percentage of rides from each community area to selected community area
-    if(direction() == 1){
-      df_new<- setNames(count(data_new()$Pickup_Community_Area), c("area_num_1", "Rides"))
+    else if (filterType() == 1) {
+      if(direction2() == 0){
+        #count the dropoffs in other community areas
+        df_new<- setNames(count(data_new()$Pickup_Community_Area), c("area_num_1", "Rides"))
+      }
+      #percentage of rides from each community area to selected community area
+      if(direction2() == 1){
+        df_new<- setNames(count(data_new()$Dropoff_Community_Area), c("area_num_1", "Rides"))
+      }  
     }
+    
+    #add in missing data with 0 Rides
+    for(x in 1:77) {
+      if (!(x %in% df_new$area_num_1)) {
+        df_new<-rbind(df_new, data.frame(area_num_1=x,Rides=0))
+      }
+    }
+    
+    #order all areas from 1-77
+    df_new <- df_new[order(df_new$area_num_1),]
+    
     df_new<-merge(df_new, community_menu, by = "area_num_1")
     sums <- sum(as.numeric(df_new$Rides))
     m <- ggplot(df_new, aes(x=community, y = (Rides/sums)*100)) + 
@@ -694,13 +730,23 @@ server <- function(input, output, session) {
     
     #calculate total rides for each area
     
-    if (direction() == 0) {
-      countsPerArea <- count(selectedData, "Dropoff_Community_Area")  
-    }
-    
-    if (direction() == 1) {
-      countsPerArea <- count(selectedData, "Pickup_Community_Area")  
+    if (filterType() == 0 || (filterType() == 1 && company() == 'All Taxi Companies')) {
+      if (direction() == 0) {
+        countsPerArea <- count(selectedData, "Dropoff_Community_Area")  
+      }
       
+      if (direction() == 1) {
+        countsPerArea <- count(selectedData, "Pickup_Community_Area")  
+      }
+    }
+    else if (filterType() == 1) {
+      if (direction2() == 0) {
+        countsPerArea <- count(selectedData, "Pickup_Community_Area")  
+      }
+      
+      if (direction2() == 1) {
+        countsPerArea <- count(selectedData, "Dropoff_Community_Area")  
+      }
     }
     
     names(countsPerArea)[1] <- 'area'

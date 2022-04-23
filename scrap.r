@@ -221,6 +221,17 @@ m
 m <- ggplot(taxi_info, aes(x=Trip_Seconds)) + geom_histogram(bins=15) + geom_bar(width = 0.9)
 m
 
+m <- ggplot(taxi_info, aes(x=Trip_Miles)) + 
+  geom_bar(stat="bin", binwidth = 5, fill="#33647A", width=0.4) +
+  scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+  labs(x = "Trip Distance (Miles)", y ="Rides")
+
+m <- m + theme_bw() +
+  theme(text = element_text(family = "sans", face = "bold")) +
+  theme(plot.title = element_text(hjust = 0.5, size=20), axis.title=element_text(size=12))
+
+m
+
 #test map:
 nycounties <- rgdal::readOGR("https://rstudio.github.io/leaflet/json/nycounties.geojson")
 
