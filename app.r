@@ -16,6 +16,9 @@ library(viridis)
 library(sf)
 #remotes::install_github("willdebras/shinykeyboard")
 
+#display five digits for all numbers 
+options(digits = 5)              
+
 #get the file names with data
 files = list.files(pattern="*.csv", full.name = T)
 
@@ -666,6 +669,7 @@ server <- function(input, output, session) {
     sums <- sum(as.numeric(df_new$Rides))
     m <- ggplot(df_new, aes(x=community, y = (Rides/sums)*100)) + 
       geom_bar(stat="identity", width=0.7, fill="#33647A") + 
+      geom_text(aes(label = sprintf("%0.2f", round((Rides/sums)*100, digits = 2))), vjust = -0.2) +
       scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
       labs(x = "Community Area", y ="Rides")+
       theme_bw() +
