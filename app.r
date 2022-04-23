@@ -478,13 +478,6 @@ server <- function(input, output, session) {
     
   })
   
-  #register map click and update selectInput
-  observeEvent(input$commMap_shape_click, {
-    click <- input$commMap_shape_click
-    
-    updateSelectInput("comm_area", "Select Community Area", community_menu$community, selected = click$id)    
-  })
-  
   #TODO change to independant
   data_new<-reactive({
     if(comm_area() == 'City of Chicago'){
@@ -503,6 +496,7 @@ server <- function(input, output, session) {
     }
     data_new
   })
+  
   
   
   #text return functions for box plot headers
@@ -722,8 +716,7 @@ server <- function(input, output, session) {
       addTiles() %>%
       addProviderTiles(provider = "CartoDB.Positron") %>%
       addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                  opacity = 1.0, fillOpacity = 0.8, fillColor = ~binpal(countsPerArea$Percent), label = ~community,
-                  highlightOptions = highlightOptions(color = "black", weight = 2, bringToFront = TRUE), layerId = ~community) %>%
+                  opacity = 1.0, fillOpacity = 0.8, fillColor = ~binpal(countsPerArea$Percent)) %>%
       addLegend(pal = binpal, values = countsPerArea$Percent, title = "Percentage of Rides for Each Area", labFormat = labelFormat(suffix = "%"), opacity = 1.0)
     
     
