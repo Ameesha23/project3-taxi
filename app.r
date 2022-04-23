@@ -478,13 +478,14 @@ server <- function(input, output, session) {
   #register map click and update selectInput
   observeEvent(input$commMap_shape_click, {
     click <- input$commMap_shape_click
-    
-    updateSelectInput("comm_area", "Select Community Area", community_menu$community, selected = click$id)    
+    #print(click)
+    updateSelectInput(session, "comm_area", "Select Community Area", community_menu$community, selected = click$id)    
+    #print(comm_area())
   })
   
   #TODO change to independant
   data_new<-reactive({
-    if(comm_area() == 'City of Chicago'){
+    if(comm_area() == 'City of Chicago' || company() == 'All Taxi Companies'){
       data_new <- taxi_info
     }
     if(comm_area() != 'City of Chicago' && direction() == 0){
