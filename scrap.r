@@ -256,8 +256,9 @@ leaflet(chi_map) %>%
 
 
 #testing selecting specific area
-data_new <- subset(taxi_info,  Dropoff_Community_Area == 2)
-targetCol <- "Pickup_Community_Area"
+data_new <- subset(taxi_info,  Pickup_Community_Area == 2)
+targetCol <- "Dropoff_Community_Area"
+head(data_new)
 
 #print(subset(data_new, select = "Dropoff_Community_Area"))
 #print(data_new[data_new$Dropoff_Community_Area == 52, ])
@@ -266,19 +267,21 @@ targetCol <- "Pickup_Community_Area"
 totalRidesHere <- nrow(data_new)
 print(totalRidesHere)
 
-countsPerArea <- count(data_new, targetCol)
+#countsPerArea <- count(data_new, "Dropoff_Community_Area")
+countsPerArea <- as.data.frame(group_by(data_new, Dropoff_Community_Area) %>%
+                              dplyr::summarise(freq=n()))
 head(countsPerArea,80)
 
 for(x in 1:77) {
-  if (!(x %in% countsPerArea$Pickup_Community_Area)) {
+  if (!(x %in% countsPerArea$Dropoff_Community_Area)) {
     #newDF[nrow(newDF)+1,] = c(x, countsPerArea)
-    countsPerArea<-rbind(countsPerArea, data.frame(Pickup_Community_Area=x,freq=0))
+    countsPerArea<-rbind(countsPerArea, data.frame(Dropoff_Community_Area=x,freq=0))
   }
 }
 
 head(countsPerArea,80)
 
-countsPerArea <- countsPerArea[order(countsPerArea$Pickup_Community_Area),]
+countsPerArea <- countsPerArea[order(countsPerArea$Dropoff_Community_Area),]
 head(countsPerArea, 80)
 
 countsPerArea$Percent <- (countsPerArea$freq / totalRidesHere)*100

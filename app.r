@@ -678,7 +678,7 @@ server <- function(input, output, session) {
     #TODO - Add plot for percent of rides to/from each community area
     #percentage of rides to each community area from selected community area
     
-    if (filterType() == 0 || (filterType() == 1 && company() == 'All Taxi Companies')) {
+    if (filterType() == 0) {
       if(direction() == 0){
         #count the dropoffs in other community areas
         df_new<- setNames(count(data_new()$Dropoff_Community_Area), c("area_num_1", "Rides"))
@@ -689,14 +689,27 @@ server <- function(input, output, session) {
       }  
     }
     else if (filterType() == 1) {
-      if(direction2() == 0){
-        #count the dropoffs in other community areas
-        df_new<- setNames(count(data_new()$Pickup_Community_Area), c("area_num_1", "Rides"))
+      if (company() != 'All Taxi Companies') {
+        if(direction2() == 0){
+          #count the dropoffs in other community areas
+          df_new<- setNames(count(data_new()$Pickup_Community_Area), c("area_num_1", "Rides"))
+        }
+        #percentage of rides from each community area to selected community area
+        if(direction2() == 1){
+          df_new<- setNames(count(data_new()$Dropoff_Community_Area), c("area_num_1", "Rides"))
+        }    
       }
-      #percentage of rides from each community area to selected community area
-      if(direction2() == 1){
-        df_new<- setNames(count(data_new()$Dropoff_Community_Area), c("area_num_1", "Rides"))
-      }  
+      else {
+        if(direction2() == 0){
+          #count the dropoffs in other community areas
+          df_new<- setNames(count(data_new()$Dropoff_Community_Area), c("area_num_1", "Rides"))
+        }
+        #percentage of rides from each community area to selected community area
+        if(direction2() == 1){
+          df_new<- setNames(count(data_new()$Pickup_Community_Area), c("area_num_1", "Rides"))
+        }
+      }
+      
     }
     
     #add in missing data with 0 Rides
@@ -730,7 +743,7 @@ server <- function(input, output, session) {
     
     #calculate total rides for each area
     
-    if (filterType() == 0 || (filterType() == 1 && company() == 'All Taxi Companies')) {
+    if (filterType() == 0 ) {
       if (direction() == 0) {
         countsPerArea <- count(selectedData, "Dropoff_Community_Area")  
       }
@@ -740,13 +753,25 @@ server <- function(input, output, session) {
       }
     }
     else if (filterType() == 1) {
-      if (direction2() == 0) {
-        countsPerArea <- count(selectedData, "Pickup_Community_Area")  
+      if (company() != 'All Taxi Companies') {
+        if (direction2() == 0) {
+          countsPerArea <- count(selectedData, "Pickup_Community_Area")  
+        }
+        
+        if (direction2() == 1) {
+          countsPerArea <- count(selectedData, "Dropoff_Community_Area")  
+        }  
+      }
+      else {
+        if (direction2() == 0) {
+          countsPerArea <- count(selectedData, "Dropoff_Community_Area")  
+        }
+        
+        if (direction2() == 1) {
+          countsPerArea <- count(selectedData, "Pickup_Community_Area")  
+        }
       }
       
-      if (direction2() == 1) {
-        countsPerArea <- count(selectedData, "Dropoff_Community_Area")  
-      }
     }
     
     names(countsPerArea)[1] <- 'area'
